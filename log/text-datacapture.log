@@ -1,0 +1,39 @@
+[2021-05-27 16:58:06,710] [26662] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:00:20,286] [26864] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:00:30,677] [26882] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:01:17,298] [26953] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:01:46,411] [27025] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:02:19,706] [27053] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:02:19,708] [27053] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:02:19,708] [27053] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:05:53,822] [27406] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:05:53,823] [27406] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:05:53,823] [27406] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:06:18,305] [27414] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:06:18,306] [27414] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:06:18,306] [27414] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:10:43,119] [27785] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:10:43,120] [27785] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:10:43,121] [27785] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:11:19,505] [27795] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:11:19,506] [27795] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:11:19,506] [27795] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:17:04,205] [28308] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:17:04,206] [28308] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:17:04,206] [28308] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:23:14,362] [28779] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:23:14,364] [28779] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:23:14,365] [28779] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:24:10,766] [28853] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:24:10,767] [28853] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:24:10,767] [28853] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:30:36,874] [29355] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:30:36,875] [29355] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:30:36,875] [29355] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:32:55,773] [29593] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:32:55,775] [29593] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:32:55,776] [29593] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:40:01,972] [30128] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2021-05-27 17:40:01,973] [30128] [INFO] - base._real_add_job (base.py:886) - Added job "record_capture_timer" to job store "default"
+[2021-05-27 17:40:01,974] [30128] [INFO] - base.start (base.py:171) - Scheduler started
+[2021-05-27 17:42:54,606] [30209] [INFO] - base.add_job (base.py:445) - Adding job tentatively -- it will be properly scheduled when the scheduler starts

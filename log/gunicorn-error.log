@@ -1,0 +1,235 @@
+[2021-05-27 10:46:32 +0800] [13373] [INFO] Starting gunicorn 20.1.0
+[2021-05-27 10:46:32 +0800] [13373] [INFO] Listening at: http://0.0.0.0:9090 (13373)
+[2021-05-27 10:46:32 +0800] [13373] [INFO] Using worker: gevent
+[2021-05-27 10:46:32 +0800] [13376] [INFO] Booting worker with pid: 13376
+[2021-05-27 10:46:32 +0800] [13377] [INFO] Booting worker with pid: 13377
+[2021-05-27 10:46:32 +0800] [13378] [INFO] Booting worker with pid: 13378
+[2021-05-27 10:46:32 +0800] [13376] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/ggevent.py", line 146, in init_process
+    super().init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/util.py", line 359, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/bin/python3.7/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 965, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'Web/web_flask'
+[2021-05-27 10:46:32 +0800] [13376] [INFO] Worker exiting (pid: 13376)
+[2021-05-27 10:46:32 +0800] [13379] [INFO] Booting worker with pid: 13379
+[2021-05-27 10:46:32 +0800] [13377] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/ggevent.py", line 146, in init_process
+    super().init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/util.py", line 359, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/bin/python3.7/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 965, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'Web/web_flask'
+[2021-05-27 10:46:32 +0800] [13377] [INFO] Worker exiting (pid: 13377)
+[2021-05-27 10:46:32 +0800] [13373] [WARNING] Worker with pid 13377 was terminated due to signal 15
+[2021-05-27 10:46:32 +0800] [13378] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/ggevent.py", line 146, in init_process
+    super().init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/util.py", line 359, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/bin/python3.7/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 965, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'Web/web_flask'
+[2021-05-27 10:46:32 +0800] [13378] [INFO] Worker exiting (pid: 13378)
+[2021-05-27 10:46:32 +0800] [13379] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/ggevent.py", line 146, in init_process
+    super().init_process()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/xu/PycharmProjects/virtualenvs/CustomDataCapture_tuhu/lib/python3.7/site-packages/gunicorn/util.py", line 359, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/bin/python3.7/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 965, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'Web/web_flask'
+[2021-05-27 10:46:32 +0800] [13379] [INFO] Worker exiting (pid: 13379)
+[2021-05-27 10:49:26 +0800] [13652] [INFO] Starting gunicorn 20.1.0
+[2021-05-27 10:49:26 +0800] [13652] [INFO] Listening at: http://0.0.0.0:9090 (13652)
+[2021-05-27 10:49:26 +0800] [13652] [INFO] Using worker: gevent
+[2021-05-27 10:49:26 +0800] [13655] [INFO] Booting worker with pid: 13655
+[2021-05-27 10:49:26 +0800] [13656] [INFO] Booting worker with pid: 13656
+[2021-05-27 10:49:26 +0800] [13657] [INFO] Booting worker with pid: 13657
+[2021-05-27 10:49:26 +0800] [13658] [INFO] Booting worker with pid: 13658
+[2021-05-27 10:51:35 +0800] [13656] [INFO] Parent changed, shutting down: <Worker 13656>
+[2021-05-27 10:51:35 +0800] [13656] [INFO] Worker exiting (pid: 13656)
+[2021-05-27 10:51:35 +0800] [13655] [INFO] Parent changed, shutting down: <Worker 13655>
+[2021-05-27 10:51:35 +0800] [13655] [INFO] Worker exiting (pid: 13655)
+[2021-05-27 10:51:35 +0800] [13657] [INFO] Parent changed, shutting down: <Worker 13657>
+[2021-05-27 10:51:35 +0800] [13657] [INFO] Worker exiting (pid: 13657)
+[2021-05-27 10:51:35 +0800] [13658] [INFO] Parent changed, shutting down: <Worker 13658>
+[2021-05-27 10:51:35 +0800] [13658] [INFO] Worker exiting (pid: 13658)
+[2021-05-27 10:52:21 +0800] [13916] [INFO] Starting gunicorn 20.1.0
+[2021-05-27 10:52:21 +0800] [13916] [INFO] Listening at: http://0.0.0.0:9090 (13916)
+[2021-05-27 10:52:21 +0800] [13916] [INFO] Using worker: gevent
+[2021-05-27 10:52:21 +0800] [13919] [INFO] Booting worker with pid: 13919
+[2021-05-27 10:52:21 +0800] [13920] [INFO] Booting worker with pid: 13920
+[2021-05-27 10:52:22 +0800] [13921] [INFO] Booting worker with pid: 13921
+[2021-05-27 10:52:22 +0800] [13922] [INFO] Booting worker with pid: 13922
+[2021-05-27 10:53:12 +0800] [13919] [INFO] Parent changed, shutting down: <Worker 13919>
+[2021-05-27 10:53:12 +0800] [13919] [INFO] Worker exiting (pid: 13919)
+[2021-05-27 10:53:12 +0800] [13920] [INFO] Parent changed, shutting down: <Worker 13920>
+[2021-05-27 10:53:12 +0800] [13920] [INFO] Worker exiting (pid: 13920)
+[2021-05-27 10:53:12 +0800] [13921] [INFO] Parent changed, shutting down: <Worker 13921>
+[2021-05-27 10:53:12 +0800] [13921] [INFO] Worker exiting (pid: 13921)
+[2021-05-27 10:53:12 +0800] [13922] [INFO] Parent changed, shutting down: <Worker 13922>
+[2021-05-27 10:53:12 +0800] [13922] [INFO] Worker exiting (pid: 13922)
+[2021-06-01 15:58:25 +0800] [255767] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 15:58:25 +0800] [255767] [INFO] Listening at: http://0.0.0.0:9090 (255767)
+[2021-06-01 15:58:25 +0800] [255767] [INFO] Using worker: gevent
+[2021-06-01 15:58:25 +0800] [255772] [INFO] Booting worker with pid: 255772
+[2021-06-01 15:58:25 +0800] [255773] [INFO] Booting worker with pid: 255773
+[2021-06-01 15:58:25 +0800] [255774] [INFO] Booting worker with pid: 255774
+[2021-06-01 15:58:25 +0800] [255775] [INFO] Booting worker with pid: 255775
+[2021-06-01 15:59:58 +0800] [255772] [INFO] Parent changed, shutting down: <Worker 255772>
+[2021-06-01 15:59:58 +0800] [255772] [INFO] Worker exiting (pid: 255772)
+[2021-06-01 15:59:58 +0800] [255773] [INFO] Parent changed, shutting down: <Worker 255773>
+[2021-06-01 15:59:58 +0800] [255773] [INFO] Worker exiting (pid: 255773)
+[2021-06-01 15:59:58 +0800] [255775] [INFO] Parent changed, shutting down: <Worker 255775>
+[2021-06-01 15:59:58 +0800] [255774] [INFO] Parent changed, shutting down: <Worker 255774>
+[2021-06-01 15:59:58 +0800] [255775] [INFO] Worker exiting (pid: 255775)
+[2021-06-01 15:59:58 +0800] [255774] [INFO] Worker exiting (pid: 255774)
+[2021-06-01 16:00:39 +0800] [256034] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 16:00:39 +0800] [256034] [INFO] Listening at: http://0.0.0.0:9090 (256034)
+[2021-06-01 16:00:39 +0800] [256034] [INFO] Using worker: gevent
+[2021-06-01 16:00:39 +0800] [256039] [INFO] Booting worker with pid: 256039
+[2021-06-01 16:00:39 +0800] [256040] [INFO] Booting worker with pid: 256040
+[2021-06-01 16:00:40 +0800] [256041] [INFO] Booting worker with pid: 256041
+[2021-06-01 16:00:40 +0800] [256042] [INFO] Booting worker with pid: 256042
+[2021-06-01 17:59:48 +0800] [256041] [INFO] Parent changed, shutting down: <Worker 256041>
+[2021-06-01 17:59:48 +0800] [256041] [INFO] Worker exiting (pid: 256041)
+[2021-06-01 17:59:49 +0800] [256042] [INFO] Parent changed, shutting down: <Worker 256042>
+[2021-06-01 17:59:49 +0800] [256040] [INFO] Parent changed, shutting down: <Worker 256040>
+[2021-06-01 17:59:49 +0800] [256039] [INFO] Parent changed, shutting down: <Worker 256039>
+[2021-06-01 17:59:49 +0800] [256042] [INFO] Worker exiting (pid: 256042)
+[2021-06-01 17:59:49 +0800] [256039] [INFO] Worker exiting (pid: 256039)
+[2021-06-01 17:59:49 +0800] [256040] [INFO] Worker exiting (pid: 256040)
+[2021-06-01 18:00:01 +0800] [265185] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 18:00:01 +0800] [265185] [INFO] Listening at: http://0.0.0.0:9090 (265185)
+[2021-06-01 18:00:01 +0800] [265185] [INFO] Using worker: gevent
+[2021-06-01 18:00:01 +0800] [265190] [INFO] Booting worker with pid: 265190
+[2021-06-01 18:00:01 +0800] [265191] [INFO] Booting worker with pid: 265191
+[2021-06-01 18:00:01 +0800] [265192] [INFO] Booting worker with pid: 265192
+[2021-06-01 18:00:01 +0800] [265193] [INFO] Booting worker with pid: 265193
+[2021-06-01 18:00:08 +0800] [265190] [INFO] Parent changed, shutting down: <Worker 265190>
+[2021-06-01 18:00:08 +0800] [265190] [INFO] Worker exiting (pid: 265190)
+[2021-06-01 18:00:08 +0800] [265191] [INFO] Parent changed, shutting down: <Worker 265191>
+[2021-06-01 18:00:08 +0800] [265191] [INFO] Worker exiting (pid: 265191)
+[2021-06-01 18:00:08 +0800] [265193] [INFO] Parent changed, shutting down: <Worker 265193>
+[2021-06-01 18:00:08 +0800] [265193] [INFO] Worker exiting (pid: 265193)
+[2021-06-01 18:00:08 +0800] [265192] [INFO] Parent changed, shutting down: <Worker 265192>
+[2021-06-01 18:00:08 +0800] [265192] [INFO] Worker exiting (pid: 265192)
+[2021-06-01 18:02:21 +0800] [265426] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 18:02:21 +0800] [265426] [INFO] Listening at: http://0.0.0.0:9090 (265426)
+[2021-06-01 18:02:21 +0800] [265426] [INFO] Using worker: gevent
+[2021-06-01 18:02:21 +0800] [265431] [INFO] Booting worker with pid: 265431
+[2021-06-01 18:02:21 +0800] [265432] [INFO] Booting worker with pid: 265432
+[2021-06-01 18:02:21 +0800] [265433] [INFO] Booting worker with pid: 265433
+[2021-06-01 18:02:21 +0800] [265434] [INFO] Booting worker with pid: 265434
+[2021-06-01 18:02:27 +0800] [265431] [INFO] Parent changed, shutting down: <Worker 265431>
+[2021-06-01 18:02:27 +0800] [265431] [INFO] Worker exiting (pid: 265431)
+[2021-06-01 18:02:27 +0800] [265432] [INFO] Parent changed, shutting down: <Worker 265432>
+[2021-06-01 18:02:27 +0800] [265432] [INFO] Worker exiting (pid: 265432)
+[2021-06-01 18:02:27 +0800] [265433] [INFO] Parent changed, shutting down: <Worker 265433>
+[2021-06-01 18:02:27 +0800] [265433] [INFO] Worker exiting (pid: 265433)
+[2021-06-01 18:02:27 +0800] [265434] [INFO] Parent changed, shutting down: <Worker 265434>
+[2021-06-01 18:02:27 +0800] [265434] [INFO] Worker exiting (pid: 265434)
+[2021-06-01 18:02:55 +0800] [265569] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 18:02:55 +0800] [265569] [INFO] Listening at: http://0.0.0.0:9090 (265569)
+[2021-06-01 18:02:55 +0800] [265569] [INFO] Using worker: gevent
+[2021-06-01 18:02:55 +0800] [265574] [INFO] Booting worker with pid: 265574
+[2021-06-01 18:02:56 +0800] [265575] [INFO] Booting worker with pid: 265575
+[2021-06-01 18:02:56 +0800] [265576] [INFO] Booting worker with pid: 265576
+[2021-06-01 18:02:56 +0800] [265577] [INFO] Booting worker with pid: 265577
+[2021-06-01 18:03:01 +0800] [265576] [INFO] Parent changed, shutting down: <Worker 265576>
+[2021-06-01 18:03:01 +0800] [265576] [INFO] Worker exiting (pid: 265576)
+[2021-06-01 18:03:01 +0800] [265575] [INFO] Parent changed, shutting down: <Worker 265575>
+[2021-06-01 18:03:01 +0800] [265575] [INFO] Worker exiting (pid: 265575)
+[2021-06-01 18:03:01 +0800] [265577] [INFO] Parent changed, shutting down: <Worker 265577>
+[2021-06-01 18:03:01 +0800] [265577] [INFO] Worker exiting (pid: 265577)
+[2021-06-01 18:03:02 +0800] [265574] [INFO] Parent changed, shutting down: <Worker 265574>
+[2021-06-01 18:03:02 +0800] [265574] [INFO] Worker exiting (pid: 265574)
+[2021-06-01 18:03:03 +0800] [265609] [INFO] Starting gunicorn 20.1.0
+[2021-06-01 18:03:03 +0800] [265609] [INFO] Listening at: http://0.0.0.0:9090 (265609)
+[2021-06-01 18:03:03 +0800] [265609] [INFO] Using worker: gevent
+[2021-06-01 18:03:03 +0800] [265612] [INFO] Booting worker with pid: 265612
+[2021-06-01 18:03:03 +0800] [265613] [INFO] Booting worker with pid: 265613
+[2021-06-01 18:03:03 +0800] [265614] [INFO] Booting worker with pid: 265614
+[2021-06-01 18:03:03 +0800] [265615] [INFO] Booting worker with pid: 265615
+[2021-06-28 17:02:52 +0800] [211371] [INFO] Starting gunicorn 20.1.0
+[2021-06-28 17:02:52 +0800] [211371] [INFO] Listening at: http://0.0.0.0:9090 (211371)
+[2021-06-28 17:02:52 +0800] [211371] [INFO] Using worker: gevent
+[2021-06-28 17:02:52 +0800] [211374] [INFO] Booting worker with pid: 211374
+[2021-06-28 17:02:52 +0800] [211375] [INFO] Booting worker with pid: 211375
+[2021-06-28 17:02:52 +0800] [211376] [INFO] Booting worker with pid: 211376
+[2021-06-28 17:02:52 +0800] [211377] [INFO] Booting worker with pid: 211377
+[2021-06-28 17:07:10 +0800] [211377] [INFO] Parent changed, shutting down: <Worker 211377>
+[2021-06-28 17:07:10 +0800] [211377] [INFO] Worker exiting (pid: 211377)
+[2021-06-28 17:07:10 +0800] [211375] [INFO] Parent changed, shutting down: <Worker 211375>
+[2021-06-28 17:07:10 +0800] [211376] [INFO] Parent changed, shutting down: <Worker 211376>
+[2021-06-28 17:07:10 +0800] [211375] [INFO] Worker exiting (pid: 211375)
+[2021-06-28 17:07:10 +0800] [211376] [INFO] Worker exiting (pid: 211376)
+[2021-06-28 17:07:10 +0800] [211374] [INFO] Parent changed, shutting down: <Worker 211374>
+[2021-06-28 17:07:10 +0800] [211374] [INFO] Worker exiting (pid: 211374)

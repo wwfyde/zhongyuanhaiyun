@@ -1,0 +1,2 @@
+[2021-06-03 11:20:29,654] [44313] [INFO] - record_capture.start_capture (record_capture.py:171) - 开始录音数据获取及推送
+[2021-06-03 11:20:29,655] [44313] [INFO] - record_capture.get_data_from_file (record_capture.py:51) - 路径不存在：record_file/2021-09-01

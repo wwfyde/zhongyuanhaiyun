@@ -1,0 +1,53 @@
+HTTP:
+  # 呼叫中心接口url
+#  DATA_REQUEST_URL: http://192.168.6.16:8091/record/synData
+  # 录音下载url
+#  RECORD_URL: http://192.168.6.5:8080/AgentRec/
+  # 抽音服务内部数据推送接口url
+  DATA_RECEIVE_URL: http://localhost:9000/datareceive
+  # 推送内部接口单位数据量
+  SEND_SIZE: 1000
+  # 录音或推送数据保存路径
+  DATA_PATH: record_file
+
+QUEUE:
+  QUEUE_HOST: 192.168.17.128
+  QUEUE_PORT: 5672
+  QUEUE_USER: admin
+  QUEUE_PWD: admin
+  QUEUE_NAME: custom_datacapture_queue
+
+LOG:
+  # 日志路径
+  LOG_PATH: log
+
+TIMER:
+  # 数据抽取定时任务时间
+  CAPTURE_SEC: 0
+  CAPTURE_MIN: '*'
+  CAPTURE_HOUR: '*'
+  # 重推失败数据定时任务时间
+  FAILED_SEC: 0
+  FAILED_MIN: '*'
+  FAILED_HOUR: '*'
+  # 文件清理定时任务时间
+  CLEAR_SEC: 0
+  CLEAR_MIN: 0
+  CLEAR_HOUR: 1
+  # 下载的录音文件保存时间
+  RECORD_STORAGE_DAYS: 30
+
+# MYSQL数据库连接
+MYSQL:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  passwd: admin
+  db: sddl
+
+# 抽取数据相关的sql
+SQL:
+  record_sql: ""
+
+# 本地录音路径前缀
+PREFIX_PATH: "/mydata/voice/Recording"
