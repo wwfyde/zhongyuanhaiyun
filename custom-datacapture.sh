@@ -5,6 +5,7 @@ BASE_DIR="`pwd`"
 RECORD_PROCESS="start_record_capture"
 GUNICORN_PROCESS="gunicorn"
 
+# TODO 程序启动入口
 record_start() {
   echo "starting record_capture..."
   pid=$(ps -ef|grep $RECORD_PROCESS |grep -v grep |awk '{if(NR==1)print $2}')
@@ -72,7 +73,7 @@ case $1 in
   start)
     if [ -z $2 ]; then
       record_start
-      gunicorn_start
+#      gunicorn_start
     elif [ $2 == "record" ]; then
       record_start
     elif [ $2 == "gunicorn" ]; then

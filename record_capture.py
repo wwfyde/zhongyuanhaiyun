@@ -3,12 +3,34 @@ import os
 import sys
 from math import ceil
 
+import httpx
+
 # 通过MySQL数据库导入
 from DB.mysql_base import MysqlBase
+from HTTP.record_data_httpx import start_request_data
 from MQ.publish_worker_pika import PublishWorker
 from config import config
 from HTTP.RecordDataRequests import request_datareceive
 from log import record_log as log
+
+
+# 该接口报废
+def get_data_from_http(start_date: str, end_date: str) -> list:
+    """
+    查询第三方接口
+    :param start_date:
+    :param end_date:
+    :return:
+    """
+    url = config["HTTP"]["DATA_REQUEST_URL"]  # 随录接口请求地址
+
+    # 请求数据
+    data = {
+
+    }
+    httpx.post(url=url, json=data)
+
+    return []
 
 
 def get_data_from_mysql(start_date, end_date):
@@ -60,6 +82,8 @@ def parse_path(data_list):
     处理录音路径字段，修改为绝对路径，排除空路径数据
     返回处理后的数据列表，及无对应录音文件的数据列表
     """
+
+    # TODO 可能需要注意一下, 录音文件目录结构的问题
     new_data_list = []
     failed_data_list = []
     total_record_path_list = []
@@ -74,6 +98,7 @@ def parse_path(data_list):
         total_record_path_list.extend([os.path.join(sub_record_path, path) for path in os.listdir(sub_record_path)])
     for data in data_list:
         if data.get("calluuid"):
+            # 根据数据列表查找相关的录音文件
             record_path_list = [path for path in total_record_path_list if data["calluuid"] in path]
             if record_path_list:
                 if len(record_path_list) > 1:
@@ -87,6 +112,7 @@ def parse_path(data_list):
     return new_data_list, failed_data_list
 
 
+# TODO 根据实际情况情况确认是否需要映射字段
 def mapping_fields(data_list):
     """
     字段值映射及其他处理
@@ -110,25 +136,26 @@ def mapping_fields(data_list):
             data["call_direction"] = "呼出"
 
 
+# TODO 序列化接口数据
 def generate_data(data_list):
     """
-    生成符合接口规范的数据
+    生成符合接口规范的数据, 并且列表每条最大1000条数据
     """
     task_info = []
     for data in data_list:
         record_info = data.copy()
         # 指定record_id
-        record_info["record_id"] = record_info["calluuid"]
+        record_info["record_id"] = record_info["callId"]
         # 指定record_time
-        record_info["record_time"] = record_info["answer_time"]
+        record_info["record_time"] = record_info["timestamp"]
         # 设置record_flag固定值0
         record_info["record_flag"] = '0'
         # 指定task_id
-        data["task_id"] = data["connid"]
+        data["task_id"] = data["appointId"]  # 对应表ID
         # 指定录音列表id
-        data["record_list"] = data["calluuid"]
+        data["record_list"] = data["callId"]
         # 指定任务时间
-        data["task_time"] = data["answer_time"]
+        data["task_time"] = data["timestamp"]
         # 设置task_flag固定值0
         data["task_flag"] = '0'
         # 设置与任务相关的录音信息列表
@@ -143,7 +170,7 @@ def generate_data(data_list):
     data_tmpl = {
         "data_type": "speech",
         "data_treatment": "batch",
-        "data_channel": "tuhu",
+        "data_channel": "tuhu",  # TODO 需要改变
         "accesskey_id": "asdf",
         "secret": "123456",
         "if_convert": "yes"
@@ -174,6 +201,7 @@ def write_to_failed_records(data_list, local_path):
     return file_path
 
 
+# TODO 程序入口
 def start_capture(append_date=None):
     """
     获取队列数据
@@ -184,7 +212,9 @@ def start_capture(append_date=None):
         log.info("开始录音数据获取及推送")
         if not append_date:
             # 自动取数
-            data_list = get_data_from_queue()
+            # TODO 直接在该位置读取数据 调用httpx 不需要额外再创建定时任务了
+            # data_list = get_data_from_queue()
+            data_list = start_request_data()
         else:
             # 手动补数
             data_list = get_data_from_file(append_date, 'total_records.txt')
@@ -192,20 +222,20 @@ def start_capture(append_date=None):
             log.info("无数据需要推送，程序结束...")
             return
         log.info(f"获取数据量：{len(data_list)}")
-        record_list, failed_data_list = parse_path(data_list)
-        log.info(f"滤除空路径后的数据量：{len(record_list)}")
-        log.info(f"无对应录音文件的数据量：{len(failed_data_list)}")
-        if failed_data_list:
-            local_path = os.path.join(config["HTTP"]["DATA_PATH"], failed_data_list[0]["answer_time"][:10])
-            if not os.path.exists(local_path):
-                os.makedirs(local_path)
-            file_path = write_to_failed_records(failed_data_list, local_path)
-            log.info(f'写入 {len(failed_data_list)} 条数据到 {file_path} 文件中')
-        if not record_list:
+        # record_list, failed_data_list = parse_path(data_list)
+        # log.info(f"滤除空路径后的数据量：{len(record_list)}")
+        # log.info(f"无对应录音文件的数据量：{len(failed_data_list)}")
+        # if failed_data_list:
+        #     local_path = os.path.join(config["HTTP"]["DATA_PATH"], failed_data_list[0]["answer_time"][:10])
+        #     if not os.path.exists(local_path):
+        #         os.makedirs(local_path)
+        #     file_path = write_to_failed_records(failed_data_list, local_path)
+        #     log.info(f'写入 {len(failed_data_list)} 条数据到 {file_path} 文件中')
+        if not data_list:
             log.info("不存在有录音文件的数据，程序结束...")
             return
-        mapping_fields(record_list)
-        data_list = generate_data(record_list)
+        # mapping_fields(data_list)  # TODO 是否需要映射字段
+        data_list = generate_data(data_list)
         request_datareceive(data_list)
     except Exception as e:
         log.error("抽音程序异常")

@@ -12,7 +12,6 @@ from config import config
 from log import record_log as log
 
 
-
 def request_data(start_date, end_date):
     """
     请求呼叫中心接口数据

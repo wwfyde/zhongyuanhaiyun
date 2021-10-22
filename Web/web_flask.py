@@ -43,6 +43,7 @@ def record():
 
     if data_list:
         # 将数据分块发送到队列中
+        # TODO 可以按照这种方式 将数据添加到队列中
         publish = PublishWorker(config["QUEUE"])
         for i in range(ceil(len(data_list) / 1000)):
             data_list_sep = data_list[i * 1000:(i + 1) * 1000]

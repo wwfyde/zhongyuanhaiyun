@@ -3,10 +3,24 @@ import os
 import shutil
 from apscheduler.schedulers.blocking import BlockingScheduler
 from record_capture import start_capture, append_failed
+from HTTP.record_data_httpx import start_request_data
 from config import config
 
 scheduler = BlockingScheduler()
 
+
+# # TODO 定时读取第三方接口并添加到队列
+# @scheduler.scheduled_job("cron", second=config["TIMER"]["CAPTURE_SEC"], minute=config["TIMER"]["CAPTURE_MIN"],
+#                          hour=config["TIMER"]["CAPTURE_HOUR"], misfire_grace_time=30, max_instances=10)
+# def get_record_data():
+#     """
+#     数据获取定时任务, 定时从第三方数据请求数据并推送到抽音框架
+#
+#     每天凌晨一点获取前一日数据
+#     :return:
+#     """
+#     # start_request_data()
+#     pass
 
 @scheduler.scheduled_job("cron", second=config["TIMER"]["CAPTURE_SEC"], minute=config["TIMER"]["CAPTURE_MIN"],
                          hour=config["TIMER"]["CAPTURE_HOUR"], misfire_grace_time=30, max_instances=10)

@@ -1,8 +1,13 @@
 HTTP:
   # 呼叫中心接口url
-#  DATA_REQUEST_URL: http://192.168.6.16:8091/record/synData
+  DATA_REQUEST_URL: http://gateway.clmp-uat.csleasing.com.cn/hitf/v1/rest/invoke?namespace=HZERO&serverCode=CCUZ.CENTER.CALL&interfaceCode=clmp-customize.udeskcallcentercalllog.queryAllType
+  # TOKEN获取URL
+  TOKEN_ACCESS_URL: http://gateway.clmp-uat.csleasing.com.cn/oauth/oauth/token?grant_type=client_credentials&client_id=clms-client&client_secret=clms-secret&scope=default
+  # 录音质检接口URL
+  RECORD_QC_URL: http://open-dev.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
+
   # 录音下载url
-#  RECORD_URL: http://192.168.6.5:8080/AgentRec/
+  #  RECORD_URL: http://192.168.6.5:8080/AgentRec/
   # 抽音服务内部数据推送接口url
   DATA_RECEIVE_URL: http://localhost:9000/datareceive
   # 推送内部接口单位数据量
@@ -11,7 +16,7 @@ HTTP:
   DATA_PATH: record_file
 
 QUEUE:
-  QUEUE_HOST: 192.168.17.128
+  QUEUE_HOST: 127.0.0.1
   QUEUE_PORT: 5672
   QUEUE_USER: admin
   QUEUE_PWD: admin
@@ -42,7 +47,7 @@ MYSQL:
   host: 127.0.0.1
   port: 3306
   user: root
-  passwd: admin
+  passwd: Pachira@123
   db: sddl
 
 # 抽取数据相关的sql

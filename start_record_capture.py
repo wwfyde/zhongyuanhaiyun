@@ -8,6 +8,7 @@ if __name__ == '__main__':
     cmd = sys.argv[1:2][0] if sys.argv[1:2] else ""
     if cmd == "start":
         from Timer.scheduler_cron import scheduler
+        # 程序入口 调度定时任务, 定时开始请求第三方接口
         scheduler.start()
     elif cmd == "append":
         date = str(sys.argv[2:3][0])
