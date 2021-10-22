@@ -340,6 +340,8 @@ def start_request_data():
         else:
             business_type = ''
 
+        # 添加业务类型到字典
+        data['business_type'] = business_type
         # 查询业务字段
         business_data: list[dict] = request_business_data(
             phone=data['customerPhone'],  # 客户接口中有 客户号码和主叫号码 需要留意
@@ -361,7 +363,7 @@ def start_request_data():
 
         # 将业务数据拼接到数据列表中
         # TODO 如果未匹配到业务数据的处理规则
-        data['business_data'] : list[dict] = business_data
+        data['business_data']: list[dict] = business_data
 
         # 将新的data添加到 data_list
         if data['record_dl_flag'] == 1:

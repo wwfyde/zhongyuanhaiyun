@@ -139,38 +139,76 @@ def mapping_fields(data_list):
 # TODO 序列化接口数据
 def generate_data(data_list):
     """
-    生成符合接口规范的数据, 并且列表每条最大1000条数据
+    生成符合接口规范的数据, 并且子列表每条最大1000条数据
     """
     task_info = []
-    for data in data_list:
-        record_info = data.copy()
-        # 指定record_id
-        record_info["record_id"] = record_info["callId"]
-        # 指定record_time
-        record_info["record_time"] = record_info["timestamp"]
-        # 设置record_flag固定值0
-        record_info["record_flag"] = '0'
-        # 指定task_id
-        data["task_id"] = data["appointId"]  # 对应表ID
-        # 指定录音列表id
-        data["record_list"] = data["callId"]
-        # 指定任务时间
-        data["task_time"] = data["timestamp"]
-        # 设置task_flag固定值0
-        data["task_flag"] = '0'
+    for item in data_list:
+        data, record_info = {}, {}
+        record_data = item.copy()
+        business_data: dict = item['business_data'][0].copy()  # 获取业务数据中的第一条
+
+        # TODO 将未序列化的数据页添加到字典
+        # record_info = item.copy()
+
+        # 录音字典定制数据
+        record_info["record_id"] = record_data["callId"]  # 通话流水号
+        record_info['record_path'] = record_data['record_path']  # 本地录音地址
+        record_info["record_time"] = record_data["timestamp"]  # 录音开始时间
+        record_info["record_flag"] = '0'  # 录音状态标记
+        record_info['customer_phone'] = record_data['customerPhone']  # 客户电话
+        record_info['workflow'] = record_data['workflow']  # 通话流程 in: 呼入
+        record_info['call_result'] = record_data['callResult']  # 通话结果
+        record_info['agent_id'] = record_data['agentID']  # 客服ID
+        record_info['agent_name'] = record_data['agentNickName']  # 客服名称
+        record_info['relevant_agent'] = record_data['relevantAgent']  # 相关客服
+        record_info['call_no'] = record_data['callNo']  # 主叫号码
+        record_info['start_time'] = record_data['startTime']  # 通话开始时间
+        record_info['end_time'] = record_data['endTime']  # 通话结束时间
+        record_info['supplier_type'] = record_data['supplierType']  # 供应商类型
+        record_info['call_state'] = record_data['callState']  # 事件状态
+        record_info['department_name'] = record_data['departmentName']  # 坐席所属部门
+        record_info['business_type'] = record_data['business_type']  # 业务类型
+        record_info['hanguper'] = record_data['hanguper']  # 主叫方
+
+        # 构造业务字段
+        data["task_id"] = data["callId"]  # 任务流水号
+        data["record_list"] = data["callId"]  # 录音列表
+        data["task_time"] = data["timestamp"]  # 任务时间
+        data["task_flag"] = '0'  # 任务标记 用于后续处理过程状态迁移标记
+
+        # 业务字典定制数据
+        data['order_no'] = business_data['orderNo']  # 订单编号
+        data['contract_no'] = business_data['contractNo']  # 合同编号
+        data['product_name'] = business_data['productName']  # 产品方案/产品信息
+        data['customer_name'] = business_data['customerName']  # 客户姓名
+        data['customer_phone'] = business_data['customerPhoneNo']  # 客户电话
+        data['apply_time'] = business_data['applyTime']  # 申请时间
+        data['business_type'] = business_data['businessTypeDesc']  # 业务类型 : 信审/客服/催收
+        data['marriage_status'] = business_data['marriageStatusDesc']  # 婚姻状况
+        data['contact_name'] = business_data['contactNameDesc']  # 联系名称
+        data['dealer_no'] = business_data['dealerNo']  # 经销商代码
+        data['dealer_name'] = business_data['dealerName']  # 经销商名称
+        data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
+        data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
+        data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
+        data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
+        data['handle_time'] = business_data['handleTime']  # 处理时间
+        data['application_status'] = business_data['applicationStatusDesc']  # 申请状态描述
+
         # 设置与任务相关的录音信息列表
-        data["record_info"] = [record_info]
+        data["record_info"] = [record_info]  # 构造录音字段数据
         task_info.append(data)
     log.info(f"已生成 {len(task_info)} 条任务数据")
     # 将task_info数据列表按照 SEND_SIZE 配置项分割成多个部分
     send_size = config["HTTP"]["SEND_SIZE"]
+    # 将一个大列表拆分成子列表最多1000个的小列表
     task_info_sep = [task_info[i * send_size:(i + 1) * send_size] for i in
                      range(ceil(len(task_info) / send_size))]
     # 生成接口数据
     data_tmpl = {
         "data_type": "speech",
         "data_treatment": "batch",
-        "data_channel": "tuhu",  # TODO 需要改变
+        "data_channel": "zyhy",  # TODO zyhy 录音转码命令中需要用到
         "accesskey_id": "asdf",
         "secret": "123456",
         "if_convert": "yes"
@@ -214,7 +252,7 @@ def start_capture(append_date=None):
             # 自动取数
             # TODO 直接在该位置读取数据 调用httpx 不需要额外再创建定时任务了
             # data_list = get_data_from_queue()
-            data_list = start_request_data()
+            data_list = start_request_data()  # 获取到的
         else:
             # 手动补数
             data_list = get_data_from_file(append_date, 'total_records.txt')
@@ -266,3 +304,8 @@ def append_failed(date):
     except Exception as e:
         log.error("抽音程序异常")
         log.error(e, exc_info=1)
+
+
+if __name__ == '__main__':
+    # 本地测试时启用
+    start_capture()

@@ -1,0 +1,111 @@
+# 批量时文件写入本地的路径， 同时也是删除数据时的路径
+DIM_PATH: ['/mydata/data-source/speech/Main',
+          ]
+SPEECH_PATH: ['/mydata/data-source/speech/Sub',
+             ]
+# 转码工具路径
+FFMPEG_BIN: '/usr/local/bin/ffmpeg'
+# VERINT录音片段拼接工具路径
+COMBINE_BIN: '/usr/local/bin/CombineWave'
+# NICE nmf2G729转码工具路径
+NMF2G729_BIN: '/usr/local/bin/nmf2G729'
+# 不同渠道的转码命令
+    # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->单声道wav
+    # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '2', '-ab', '128k', desWav]--->双声道wav
+    # [ffmpeg_path, '-acodec', 'adpcm_ima_oki', '-f', 's16le', '-ar', '6000', '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->v3
+    # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->mp3
+    # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '2', '-ab', '128k', desWav]--->aac
+    # [ffmpeg_path, '-acodec', 'adpcm_ima_oki', '-f', 's16le', '-ar', '8000', '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->vox
+    # [ffmpeg_path, '-acodec', 'g729', '-f', 'g729' ,'-i', srcPath2, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->nmf
+
+#key：项目名或渠道名，即data_channel,如：dfxk、zynx、bj、wh
+#value:转码命令
+#TODO  不同渠道采用不同命令 key为渠道名
+CMDCOMMANDS: {'zyhy':['ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '1', '-ab', '128k', 'desWav'],
+             }
+    
+# LOG路径&级别
+LOG_PATH: 'logs'
+LOG_LEVEL: 'INFO'
+#如果是批量间隔多少秒时间取一次数据
+INTERVAL_TIME: 10
+# 如果是批量 一次批量最多取的任务量
+MAX_BATCH_NUM: 1000
+#时间戳 区分队列数据
+TIMESTAMP: "task_time"
+#转码并发路数
+CONVERT_PROCESSES: 20
+#dim分隔符
+DIM_SEPARATION_CHARACTER: "|"
+# 全部大写
+TASK_FILED: ['TASK_ID','RECORD_LIST','TASK_TIME','TASK_FLAG' , 'ORDER_NO', 'CONTRACT_NO','PRODUCT_NAME' , 'CUSTOMER_NAME', 'CUSTOMER_PHONE', 'APPLY_TIME','BUSINESS_TYPE', 'MARRIAGE_STATUS', 'CONTACT_NAME', 'DEALER_NO':, 'DEALER_NAME':, 'DEALER_ABBR':, 'PREQUALIFICATION_LEVEL', 'CREDIT_REVIEW_RESULT', 'FINAL_APPROVAL_RESULT', 'HANDLE_TIME', 'APPLICATION_STATUS','COLUMN1','COLUMN2']
+
+# 任务维度映射值
+TASK_FILED_MAP: {
+                    'TASK_ID':'任务流水号',
+                    'RECORD_LIST':'录音列表',
+                    'TASK_TIME':'任务时间',
+                    'TASK_FLAG': '任务标记',
+                    'ORDER_NO': '订单编号',
+                    'CONTRACT_NO': '合同编号',
+                    'PRODUCT_NAME': '产品信息',
+                    'CUSTOMER_NAME': '客户姓名',
+                    'CUSTOMER_PHONE': '客户电话',
+                    'APPLY_TIME': '申请时间',
+                    'BUSINESS_TYPE': '业务类型',
+                    'MARRIAGE_STATUS': '婚姻状况',
+                    'CONTACT_NAME': '联系名称',
+                    'DEALER_NO': '经销商代码',
+                    'DEALER_NAME': '经销商名称',
+                    'DEALER_ABBR': '经销商简称',
+                    'PREQUALIFICATION_LEVEL': '预审批等级',
+                    'CREDIT_REVIEW_RESULT': '信审结果',
+                    'FINAL_APPROVAL_RESULT': '终审结果',
+                    'HANDLE_TIME': '处理时间',
+                    'APPLICATION_STATUS': '申请状态',
+                    'COLUMN1':'字段1',
+                    'COLUMN2':'字段2',
+             }
+
+# 全部大写
+RECORD_FILED: ['RECORD_ID','RECORD_PATH','RECORD_TIME','RECORD_FLAG', 'CUSTOMER_PHONE', 'WORKFLOW' , 'CALL_RESULT': '通话结果',  'AGENT_ID', 'AGENT_NAME',  'RELEVANT_AGENT', 'CALL_NO',  'START_TIME', 'END_TIME', 'SUPPLIER_TYPE', 'CALL_STATE', 'DEPARTMENT_NAME', 'BUSINESS_TYPE', 'HANGUPER', 'COLUMN1','COLUMN2']
+# 录音维度映射值
+RECORD_FILED_MAP: {
+                    'RECORD_ID':'电话流水号',
+                    'RECORD_PATH':'录音地址',
+                    'RECORD_TIME':'录音开始时间',
+                    'RECORD_FLAG': '录音状态标记',
+                    'CUSTOMER_PHONE': '客户电话',
+                    'WORKFLOW': '呼叫方向', 
+                    'CALL_RESULT': '通话结果', 
+                    'AGENT_ID': '客服ID',
+                    'AGENT_NAME': '客服姓名', 
+                    'RELEVANT_AGENT': '相关客服', 
+                    'CALL_NO': '主叫号码', 
+                    'START_TIME': '开始时间',
+                    'END_TIME': '结束时间', 
+                    'SUPPLIER_TYPE': '供应商类型', 
+                    'CALL_STATE': '事件状态', 
+                    'DEPARTMENT_NAME': '部门名称',
+                    'BUSINESS_TYPE': '业务类型',
+                    'HANGUPER': '主叫方', 
+                    'COLUMN1':'字段1',
+                    'COLUMN2':'字段2',
+}
+
+#框架用到的数据库类型:mysql/oracle/mssql
+DB_TYPE: 'mysql'
+#业务随路保留时间
+DELETE_TASRDATA: 5
+#录音随路保留时间
+DELETE_RECORDDATA: 5
+#数据源WAV保留时间
+DELETE_DIMDATA: 2
+#只删除数据源保留时间往前n天的数据
+DELETE_DIMDATA_BEFORE: 10
+#临时录音文件保留时间
+DELETE_CONVERTDATA: 5
+#RABBITMQ心跳检测时间（秒）
+HEARTBEAT_TIMEOUT: 7200
+#抽音是否上报登记簿True/False
+IF_DATACAPTURE_TRANCK: True
