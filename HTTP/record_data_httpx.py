@@ -150,7 +150,7 @@ def request_business_data(phone: str = '', start_time: str = '', end_time: str =
 
         result = json.loads(resp.text)
         if result['respCode'] == '0000':
-            business_data: list[dict] = result['data']['voiceQualityTestingList']
+            business_data: list[dict] = result['data']['voiceQualityInspectionList']
             log.info(f"获取录音质检业务数据成功, 录音数据: {str(business_data)}")
         else:
             business_data = []
@@ -271,6 +271,23 @@ def push_datareceive(data_list):
              f"失败 {fail_count} 条")
 
 
+def request_datareceive(data_list):
+    """
+    推送内部接口
+    :param data_list: 符合规范的数据列表
+    """
+    fail_count = 0
+    for data in data_list:
+        log.info(f"推送数据量：{len(data['task_info'])}")
+        resp = httpx.post(config["HTTP"]["DATA_RECEIVE_URL"], json=data)
+        log.info(resp.json())
+        if resp.json().get('CODE') != 20:
+            fail_count += 1
+    requests_count = len(data_list)
+    log.info(f"数据推送完毕，总请求数：{requests_count}，成功 {requests_count - fail_count} 条，"
+             f"失败 {fail_count} 条")
+
+
 def start_request_data():
     """
     通过定时器调用该任务
@@ -278,12 +295,13 @@ def start_request_data():
     """
     # 获取当前时间日期
     yesterday = datetime.datetime.today() + datetime.timedelta(-1)
+    # start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
+    start_time = '2021-09-01' + ' ' + '00:00:00'
     end_time = yesterday.strftime('%Y-%m-%d') + ' ' + '23:59:59'
-    start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
 
     # 根据当前时间获取最近一天的录音通话记录数据
     receive_data = request_record_data(start_time, end_time)
-    log.info(f"请求随录数据成功: {receive_data}")
+    log.info(f"正在获取日期: {start_time[:10]}的数据, 请求随录数据成功: {receive_data}")
 
     # 格式化随录数据
 
@@ -293,85 +311,88 @@ def start_request_data():
     for data in receive_data:
 
         # remote_record_path: str = data['pullRecordUrls']  # 录音下载地址
-        remote_record_path: str = data['pullRecordUrls'].replace('http://minio-7c27d1.camp-uat-upgrade:9000', 'http://10.18.110.120:30200/ ')  # 录音下载地址
-        # 示例 http://minio-7c27d1.camp-uat-upgrade:9000 \
-        # /hzero-hzero-public/0/b7b735d91675483a9766c267aa6db191@hollyCrm-1625470045.244822.mp3
-        uid = str(uuid.uuid1())
-        file_name = uid + '.' + remote_record_path.split('.')[-1]  # 使用call-id
+        # TODO 当录音文件不存在时需要处理
+        if data['pullRecordUrls']:
+            remote_record_path: str = data['pullRecordUrls'].replace('http://minio-7c27d1.camp-uat-upgrade:9000',
+                                                                     'http://10.18.110.120:30200')  # 录音下载地址
+            # 示例 http://minio-7c27d1.camp-uat-upgrade:9000 \
+            # /hzero-hzero-public/0/b7b735d91675483a9766c267aa6db191@hollyCrm-1625470045.244822.mp3
+            uid = str(uuid.uuid1())
+            file_name = uid + '.' + remote_record_path.split('.')[-1]  # 使用call-id
 
-        # TODO 按照 年-月-日/ call_uuid 存储数据
-        yesterday_date = yesterday.strftime('%Y-%m-%d')
-        local_record_path_prefix = os.path.join(config['PREFIX_PATH'], yesterday_date)
-        if not os.path.exists(local_record_path_prefix):
-            # 按照日期创建录音文件夹
-            os.makedirs(local_record_path_prefix)
+            # TODO 按照 年-月-日/ call_uuid 存储数据
+            yesterday_date = yesterday.strftime('%Y-%m-%d')
+            local_record_path_prefix = os.path.join(config['PREFIX_PATH'], yesterday_date)
+            if not os.path.exists(local_record_path_prefix):
+                # 按照日期创建录音文件夹
+                os.makedirs(local_record_path_prefix)
 
-        local_record_path = os.path.join(local_record_path_prefix, file_name)
+            local_record_path = os.path.join(local_record_path_prefix, file_name)
 
-        # status = download_record(remote_record_path, local_record_path)
+            # status = download_record(remote_record_path, local_record_path)
 
-        #
-        i = 0
-        while i < 3:
-            status = download_record(remote_record_path, local_record_path)
-            if status:
-                # 下载成功
-                # TODO 更新录音地址
-                data['record_path'] = local_record_path
-                data['record_uuid'] = uid
-                data['record_dl_flag'] = 1
-                break
+            #
+            i = 0
+            while i < 3:
+                status = download_record(remote_record_path, local_record_path)
+                if status:
+                    # 下载成功
+                    # TODO 更新录音地址
+                    log.info(f'通话流水号: {data["callId"]}, 录音文件下载成功,本地地址: {local_record_path}!')
+                    data['record_path'] = local_record_path
+                    data['record_uuid'] = uid
+                    data['record_dl_flag'] = 1
+                    break
 
-            else:
-                data['record_dl_flag'] = 0
-                # 如果下载失败需要重试
-                i = i + 1
-        pass
-
-        # TODO 获取数据类型
-        # TODO 确定业务类型规则  根据坐席所属部门确定业务类型
-        if data['departmentName'] == '风险管理部门':
-            business_type = 'CREDIT_REVIEW'  # 信审
-        elif data['departmentName'] == '客户服务部门':
-            business_type = 'CUSTOMER_SERVICE'  # 客服
-        elif data['departmentName'] == '资产管理部':
-            business_type = 'COLLECTION'  # 催收
-        # TODO 需要确定是否还有其他的部门名称或类型
-        else:
-            business_type = ''
-
-        # 添加业务类型到字典
-        data['business_type'] = business_type
-        # 查询业务字段
-        business_data: list[dict] = request_business_data(
-            phone=data['customerPhone'],  # 客户接口中有 客户号码和主叫号码 需要留意
-            start_time=data['startTime'][:10],
-            end_time=data['endTime'][:10],
-            business_type=business_type,
-            agent_name=data['agentNickName']
-        )
-
-        # 标准化接口数据
-        # task_wrap = {
-        #     'data_type': 'speech',
-        #     'data_treatment': 'batch',
-        #     'data_channel': 'bj',
-        #     'accesskey_id': 'asdf',
-        #     'secret': '123456',
-        #     'if_convert': 'yes',
-        # }
-
-        # 将业务数据拼接到数据列表中
-        # TODO 如果未匹配到业务数据的处理规则
-        data['business_data']: list[dict] = business_data
-
-        # 将新的data添加到 data_list
-        if data['record_dl_flag'] == 1:
-
-            data_list.append(data)
-        # TODO 下载失败的数据处理规则
-        else:
+                else:
+                    data['record_dl_flag'] = 0
+                    # 如果下载失败需要重试
+                    i = i + 1
             pass
+
+            # TODO 获取数据类型
+            # TODO 确定业务类型规则  根据坐席所属部门确定业务类型
+            log.info(f"坐席所属部门: [{data['departmentName']}].")
+            if data['departmentName'] == '风险管理部':
+                business_type = 'CREDIT_REVIEW'  # 信审
+            elif data['departmentName'] == '客户服务部':
+                business_type = 'CUSTOMER_SERVICE'  # 客服
+            elif data['departmentName'] == '资产管理部':
+                business_type = 'COLLECTION'  # 催收
+            # TODO 需要确定是否还有其他的部门名称或类型
+            else:
+                log.info(f"未识别的部门: {data['departmentName']}, 通话流水号: {data['callId']}")
+                business_type = ''
+
+            # 添加业务类型到字典
+            data['business_type'] = business_type
+            # 查询业务字段
+            if data['customerPhone'] and business_type:
+                business_data: list[dict] = request_business_data(
+                    phone=data['customerPhone'],  # 客户接口中有 客户号码和主叫号码 需要留意
+                    start_time=data['startTime'][:10],
+                    end_time=data['endTime'][:10],
+                    business_type=business_type,
+                    agent_name=data['agentNickName']
+                )
+
+                # 将业务数据拼接到数据列表中
+                # TODO 如果未匹配到业务数据的处理规则
+                data['business_data']: list[dict] = business_data
+            else:
+                log.error(f"客户号码: {data['customerPhone']} 或 坐席所属部门: {data['departmentName']}未匹配业务类型")
+                data['business_data']: list[dict] = []
+
+            # 将新的data添加到 data_list
+            if data['record_dl_flag'] == 1:
+
+                data_list.append(data)
+            # TODO 下载失败的数据处理规则
+            else:
+                pass
+        else:
+            # TODO 需要添加到额外
+            log.error("录音文件不存在!")
     log.info(f"昨日录音数据获取成功, 共{len(receive_data)}条, 成功获取录音文件{len(data_list)}条.")
 
     return data_list

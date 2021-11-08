@@ -38,7 +38,9 @@ CONVERT_PROCESSES: 20
 #dim分隔符
 DIM_SEPARATION_CHARACTER: "|"
 # 全部大写
-TASK_FILED: ['TASK_ID','RECORD_LIST','TASK_TIME','TASK_FLAG' , 'ORDER_NO', 'CONTRACT_NO','PRODUCT_NAME' , 'CUSTOMER_NAME', 'CUSTOMER_PHONE', 'APPLY_TIME','BUSINESS_TYPE', 'MARRIAGE_STATUS', 'CONTACT_NAME', 'DEALER_NO':, 'DEALER_NAME':, 'DEALER_ABBR':, 'PREQUALIFICATION_LEVEL', 'CREDIT_REVIEW_RESULT', 'FINAL_APPROVAL_RESULT', 'HANDLE_TIME', 'APPLICATION_STATUS','COLUMN1','COLUMN2']
+TASK_FILED: ['TASK_ID','RECORD_LIST','TASK_TIME','TASK_FLAG' , 'CUSTOMER_PHONE', 'WORKFLOW' ,
+             'CALL_RESULT',  'AGENT_ID', 'AGENT_NAME',  'RELEVANT_AGENT', 'CALL_NO',  'START_TIME',
+             'END_TIME', 'SUPPLIER_TYPE', 'CALL_STATE', 'DEPARTMENT_NAME', 'BUSINESS_TYPE', 'HANGUPER']
 
 # 任务维度映射值
 TASK_FILED_MAP: {
@@ -46,51 +48,30 @@ TASK_FILED_MAP: {
                     'RECORD_LIST':'录音列表',
                     'TASK_TIME':'任务时间',
                     'TASK_FLAG': '任务标记',
-                    'ORDER_NO': '订单编号',
-                    'CONTRACT_NO': '合同编号',
-                    'PRODUCT_NAME': '产品信息',
-                    'CUSTOMER_NAME': '客户姓名',
-                    'CUSTOMER_PHONE': '客户电话',
-                    'APPLY_TIME': '申请时间',
-                    'BUSINESS_TYPE': '业务类型',
-                    'MARRIAGE_STATUS': '婚姻状况',
-                    'CONTACT_NAME': '联系名称',
-                    'DEALER_NO': '经销商代码',
-                    'DEALER_NAME': '经销商名称',
-                    'DEALER_ABBR': '经销商简称',
-                    'PREQUALIFICATION_LEVEL': '预审批等级',
-                    'CREDIT_REVIEW_RESULT': '信审结果',
-                    'FINAL_APPROVAL_RESULT': '终审结果',
-                    'HANDLE_TIME': '处理时间',
-                    'APPLICATION_STATUS': '申请状态',
-                    'COLUMN1':'字段1',
-                    'COLUMN2':'字段2',
-             }
+                    'CUSTOMER_PHONE': '客户电话',  # 1
+                    'WORKFLOW': '通话类型',  # 1
+                    'CALL_RESULT': '通话结果',
+                    'AGENT_ID': '客服ID',
+                    'AGENT_NAME': '客服姓名',# 1
+                    'RELEVANT_AGENT': '相关客服',
+                    'CALL_NO': '主叫号码',  # 1
+                    'START_TIME': '开始时间',  # 1
+                    'END_TIME': '结束时间',  # 1
+                    'SUPPLIER_TYPE': '供应商类型',
+                    'CALL_STATE': '事件状态',
+                    'DEPARTMENT_NAME': '部门名称',
+                    'BUSINESS_TYPE': '业务类型',  # 1
+                    'HANGUPER': '主叫方',  # 1
+}
 
 # 全部大写
-RECORD_FILED: ['RECORD_ID','RECORD_PATH','RECORD_TIME','RECORD_FLAG', 'CUSTOMER_PHONE', 'WORKFLOW' , 'CALL_RESULT': '通话结果',  'AGENT_ID', 'AGENT_NAME',  'RELEVANT_AGENT', 'CALL_NO',  'START_TIME', 'END_TIME', 'SUPPLIER_TYPE', 'CALL_STATE', 'DEPARTMENT_NAME', 'BUSINESS_TYPE', 'HANGUPER', 'COLUMN1','COLUMN2']
+RECORD_FILED: ['RECORD_ID','RECORD_PATH','RECORD_TIME','RECORD_FLAG']
 # 录音维度映射值
 RECORD_FILED_MAP: {
                     'RECORD_ID':'电话流水号',
                     'RECORD_PATH':'FilePath',
                     'RECORD_TIME':'录音开始时间',
                     'RECORD_FLAG': '录音状态标记',
-                    'CUSTOMER_PHONE': '客户电话',
-                    'WORKFLOW': '呼叫方向', 
-                    'CALL_RESULT': '通话结果', 
-                    'AGENT_ID': '客服ID',
-                    'AGENT_NAME': '客服姓名', 
-                    'RELEVANT_AGENT': '相关客服', 
-                    'CALL_NO': '主叫号码', 
-                    'START_TIME': '开始时间',
-                    'END_TIME': '结束时间', 
-                    'SUPPLIER_TYPE': '供应商类型', 
-                    'CALL_STATE': '事件状态', 
-                    'DEPARTMENT_NAME': '部门名称',
-                    'BUSINESS_TYPE': '业务类型',
-                    'HANGUPER': '主叫方', 
-                    'COLUMN1':'字段1',
-                    'COLUMN2':'字段2',
 }
 
 #框架用到的数据库类型:mysql/oracle/mssql

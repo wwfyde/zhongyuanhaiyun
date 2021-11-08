@@ -4,3 +4,9 @@
 [2021-10-22 16:13:21,604] [38210] [INFO] - record_data_httpx.start_request_data (record_data_httpx.py:286) - 请求随录数据成功: []
 [2021-10-22 16:13:21,604] [38210] [INFO] - record_data_httpx.start_request_data (record_data_httpx.py:375) - 昨日录音数据获取成功, 共0条, 成功获取录音文件0条.
 [2021-10-22 16:13:21,604] [38210] [INFO] - record_capture.start_capture (record_capture.py:260) - 无数据需要推送，程序结束...
+[2021-10-22 16:25:22,884] [41070] [INFO] - record_capture.start_capture (record_capture.py:250) - 开始录音数据获取及推送
+[2021-10-22 16:25:23,051] [41070] [ERROR] - record_data_httpx.request_record_data (record_data_httpx.py:102) - 请求第三方接口失败, 请检查接口包含token获取接口是否正常, 
+ 错误提示: [Errno 8] nodename nor servname provided, or not known
+[2021-10-22 16:25:23,053] [41070] [INFO] - record_data_httpx.start_request_data (record_data_httpx.py:286) - 请求随录数据成功: []
+[2021-10-22 16:25:23,053] [41070] [INFO] - record_data_httpx.start_request_data (record_data_httpx.py:375) - 昨日录音数据获取成功, 共0条, 成功获取录音文件0条.
+[2021-10-22 16:25:23,053] [41070] [INFO] - record_capture.start_capture (record_capture.py:260) - 无数据需要推送，程序结束...
