@@ -369,7 +369,7 @@ def start_request_data():
             # 查询业务字段
             if data['customerPhone'] and business_type:
                 business_data: list[dict] = request_business_data(
-                    phone=data['customerPhone'],  # 客户接口中有 客户号码和主叫号码 需要留意
+                    phone=data['customerPhone'],  # 填写客户号码
                     start_time=data['startTime'][:10],
                     end_time=data['endTime'][:10],
                     business_type=business_type,
