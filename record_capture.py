@@ -118,22 +118,16 @@ def mapping_fields(data_list):
     字段值映射及其他处理
     """
     for data in data_list:
-        if data.get("cde_call_type") == 1 or data.get("cde_call_type") == '1':
-            data["cde_call_type"] = "内部呼叫"
-        elif data.get("cde_call_type") == 2 or data.get("cde_call_type") == '2':
-            data["cde_call_type"] = "呼入"
-        elif data.get("cde_call_type") == 3 or data.get("cde_call_type") == '3':
-            data["cde_call_type"] = "呼出"
-        if data.get("cde_release_code") == "1 local":
-            data["cde_release_code"] = "坐席挂机"
-        elif data.get("cde_release_code") == "2 remote":
-            data["cde_release_code"] = "客户挂机"
-        if data.get("cde_call_type") in ("呼入", "呼出"):
-            data["call_direction"] = data["cde_call_type"]
-        elif data.get("employeeid"):
-            data["call_direction"] = "呼入"
-        elif data.get("employeeid_from"):
-            data["call_direction"] = "呼出"
+        # 呼叫类型调整
+        if data['workflow'] == 'normal':
+            data['workflow'] = '呼入'
+        elif data['workflow'] == 'dialout':
+            data['workflow'] = '呼出'
+        # 挂机方向调整
+        if data['hanguper'] == 'customer':
+            data['hanguper'] = '客户挂机'
+        elif data['hanguper'] == 'agent':
+            data['hanguper'] = '坐席挂机'
 
 
 # TODO 序列化接口数据
@@ -259,7 +253,7 @@ def generate_data(data_list):
 
         # 20211109 新增
         data['total_time'] = record_data['totalTime']  # 通话时长: 秒
-        data['drop_side'] = record_data['dropSide']  # 挂机方向
+        data['drop_side'] = record_data['dropSide']  # 挂机方向 为空
         data['ring_time'] = record_data['agentRingAt']  # 来电时间, 响铃时间
 
         # 构造业务字段
@@ -366,7 +360,7 @@ def start_capture(append_date=None):
         if not data_list:
             log.info("不存在有录音文件的数据，程序结束...")
             return
-        # mapping_fields(data_list)  # TODO 是否需要映射字段
+        mapping_fields(data_list)  # TODO 是否需要映射字段
         data_list = generate_data(data_list)
         request_datareceive(data_list)
     except Exception as e:

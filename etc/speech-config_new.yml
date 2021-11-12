@@ -53,7 +53,7 @@ TASK_FILED_MAP: {
     'TASK_FLAG': '任务标记',
     'CUSTOMER_PHONE': '客户电话',  # 1
 
-    'WORKFLOW': '通话类型',  # 1
+    'WORKFLOW': '呼叫类型',  # 1  呼入/呼出
     'CALL_RESULT': '通话结果',
     'AGENT_ID': '客服ID',
     'AGENT_NAME': '客服姓名',# 1
@@ -68,10 +68,10 @@ TASK_FILED_MAP: {
     'CALL_STATE': '事件状态',
     'DEPARTMENT_NAME': '部门名称', # 1
     'BUSINESS_TYPE': '业务类型',  # 1
-    'HANGUPER': '主叫方',  # 1
+    'HANGUPER': '挂机方向',  # 1
     'TOTAL_TIME': '通话时长',
 
-    'DROP_SIDE': '挂机方向',
+    'DROP_SIDE': '挂机方向2',
     'RING_TIME': '来电时间',
 
 
