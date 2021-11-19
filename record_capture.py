@@ -343,7 +343,9 @@ def start_capture(append_date=None):
             data_list = start_request_data()  # 获取到的
         else:
             # 手动补数
-            data_list = get_data_from_file(append_date, 'total_records.txt')
+            log.info(f"根据日期: {append_date}手动补数")
+            data_list = start_request_data(append_date)
+            # data_list = get_data_from_file(append_date, 'total_records.txt')
         if not data_list:
             log.info("无数据需要推送，程序结束...")
             return

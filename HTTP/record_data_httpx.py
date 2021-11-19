@@ -288,7 +288,7 @@ def request_datareceive(data_list):
              f"失败 {fail_count} 条")
 
 
-def start_request_data():
+def start_request_data(date=None):
     """
     通过定时器调用该任务
     :return: 包含原生录音数据 和业务数据 并下载录音和更新了下载地址
@@ -296,8 +296,15 @@ def start_request_data():
     # 获取当前时间日期
     yesterday = datetime.datetime.today() + datetime.timedelta(-1)
     # start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
-    start_time = '2021-09-01' + ' ' + '00:00:00'
-    end_time = yesterday.strftime('%Y-%m-%d') + ' ' + '23:59:59'
+
+    # 根据日期手动补数 格式: YYYY-mm-dd
+    if date:
+        start_time = date + ' ' + '00:00:00'
+        end_time = date + ' ' + '23:59:59'
+    else:
+        start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
+        end_time = yesterday.strftime('%Y-%m-%d') + ' ' + '23:59:59'
+
 
     # 根据当前时间获取最近一天的录音通话记录数据
     receive_data = request_record_data(start_time, end_time)
