@@ -4,7 +4,8 @@ HTTP:
   # TOKEN获取URL
   TOKEN_ACCESS_URL: http://gateway.clmp-uat.csleasing.com.cn/oauth/oauth/token?grant_type=client_credentials&client_id=clms-client&client_secret=clms-secret&scope=default
   # 录音质检接口URL
-  RECORD_QC_URL: http://open-dev.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
+#  RECORD_QC_URL: http://open-dev.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
+  RECORD_QC_URL:  http://open.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
 
   # 录音下载url
   #  RECORD_URL: http://192.168.6.5:8080/AgentRec/

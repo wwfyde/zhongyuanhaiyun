@@ -235,8 +235,8 @@ def generate_data(data_list):
         record_info["record_time"] = record_data["timestamp"]  # 录音开始时间
         record_info["record_flag"] = '0'  # 录音状态标记
 
-
         data['customer_phone'] = record_data['customerPhone']  # 客户电话
+        data['called_no'] = record_data['customerPhone']  # 客户电话
         data['workflow'] = record_data['workflow']  # 通话流程 in: 呼入
         data['call_result'] = record_data['callResult']  # 通话结果
         data['agent_id'] = record_data['agentId']  # 客服ID
@@ -264,25 +264,43 @@ def generate_data(data_list):
 
         # TODO 业务字段 当接口通了或生产环境时需要匹配
         # # 业务字典定制数据
-        # business_data: dict = item['business_data'][0].copy()  # 获取业务数据中的第一条
-        # data['order_no'] = business_data['orderNo']  # 订单编号
-        # data['contract_no'] = business_data['contractNo']  # 合同编号
-        # data['product_name'] = business_data['productName']  # 产品方案/产品信息
-        # data['customer_name'] = business_data['customerName']  # 客户姓名
-        # data['customer_phone'] = business_data['customerPhoneNo']  # 客户电话
-        # data['apply_time'] = business_data['applyTime']  # 申请时间
-        # data['business_type'] = business_data['businessTypeDesc']  # 业务类型 : 信审/客服/催收
-        # data['marriage_status'] = business_data['marriageStatusDesc']  # 婚姻状况
-        # data['contact_name'] = business_data['contactNameDesc']  # 联系名称
-        # data['dealer_no'] = business_data['dealerNo']  # 经销商代码
-        # data['dealer_name'] = business_data['dealerName']  # 经销商名称
-        # data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
-        # data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
-        # data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
-        # data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
-        # data['handle_time'] = business_data['handleTime']  # 处理时间
-        # data['application_status'] = business_data['applicationStatusDesc']  # 申请状态描述
-        # data['customer_problems'] = business_data['customerProblems']  # 客户问题
+        if len(item['business_data']):
+            business_data: dict = item['business_data'][0].copy()  # 获取业务数据中的第一条
+            data['order_no'] = business_data['orderNo']  # 订单编号
+            data['contract_no'] = business_data['contractNo']  # 合同编号
+            data['product_name'] = business_data['productName']  # 产品方案/产品信息
+            data['customer_name'] = business_data['customerName']  # 客户姓名
+            # data['customer_phone'] = business_data['customerPhoneNo']  # 客户电话
+            data['apply_time'] = business_data['applyTime']  # 申请时间
+            data['business_type_desc'] = business_data['businessTypeDesc']  # 业务类型 : 信审/客服/催收
+            data['marriage_status'] = business_data['marriageStatusDesc']  # 婚姻状况
+            data['contact_name_desc'] = business_data['contactNameDesc']  # 联系名称
+            data['dealer_no'] = business_data['dealerNo']  # 经销商代码
+            data['dealer_name'] = business_data['dealerName']  # 经销商名称
+            data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
+            data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
+            data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
+            data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
+            data['handle_time'] = business_data['handleTime']  # 处理时间
+            data['application_status'] = business_data['applicationStatusDesc']  # 申请状态描述
+            data['customer_problems'] = business_data['customerProblems']  # 客户问题
+
+            # 20211122新增
+            data['brand_type'] = business_data['brandType']  # 是否LCV
+            data['car_level'] = business_data['carLevel']  # 车辆级别
+            data['finance_balance'] = business_data['frze']  # 融资余额
+            data['apply_type'] = business_data['applyType']  # 公司性质
+            data['bonds_name'] = business_data['bondsName']  # 公户申请人
+            data['coll_back_type'] = business_data['collBackType']  # 催收结果
+            data['case_end'] = business_data['caseEnd']  # 任务截止日期
+            data['node_name'] = business_data['nodeName']  # 审批节点
+            data['id_card_no'] = business_data['idCardNo']  # 身份证号
+            data['case_date'] = business_data['caseDate']  # 流入日期
+            data['contact_name'] = business_data['contactName']  # 流入日期
+
+        else:
+            # TODO 需要添加到失败队列
+            log.error("未匹配到相关业务接口数据")
 
         # 设置与任务相关的录音信息列表
         data["record_info"] = [record_info]  # 构造录音字段数据
@@ -308,6 +326,7 @@ def generate_data(data_list):
         data["task_info"] = task_info
         data_list.append(data)
     return data_list
+
 
 def err_handler(request, exception):
     log.error("请求出错", exception)

@@ -12,6 +12,8 @@ from concurrent.futures import as_completed
 
 import httpx
 import requests
+from typing import List
+
 from config import config
 from log import record_log as log
 
@@ -140,21 +142,25 @@ def request_business_data(phone: str = '', start_time: str = '', end_time: str =
     """
     qc_url = config["HTTP"]["RECORD_QC_URL"]
     try:
+        # httpx默认5秒会超时, 但是请求接口时可能会超过5秒
         resp = httpx.post(qc_url, json={
             'phoneNo': phone,
             'businessType': business_type,
             'customerServiceName': agent_name,
             'dialBeginDate': start_time,
             'dialEndDate': end_time
-        })
+        }, timeout=40)
 
         result = json.loads(resp.text)
         if result['respCode'] == '0000':
-            business_data: list[dict] = result['data']['voiceQualityInspectionList']
+            business_data: List[dict] = result['data']['voiceQualityInspectionList']
             log.info(f"获取录音质检业务数据成功, 录音数据: {str(business_data)}")
         else:
             business_data = []
             log.error(f"接口返回了错误的状态码, 状态码: {result['respCode']}, 状态错误提示: {result['respMsg']}")
+    except httpx.ReadTimeout as exc:
+        log.error("接口返回超时")
+
     except Exception as exc:
         log.error(f'获取录音质检业务数据失败, 请确认接口通信是否正常. \n错误提示: {exc}')
         business_data = []
@@ -305,7 +311,6 @@ def start_request_data(date=None):
         start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
         end_time = yesterday.strftime('%Y-%m-%d') + ' ' + '23:59:59'
 
-
     # 根据当前时间获取最近一天的录音通话记录数据
     receive_data = request_record_data(start_time, end_time)
     log.info(f"正在获取日期: {start_time[:10]}的数据, 请求随录数据成功: {receive_data}")
@@ -320,8 +325,9 @@ def start_request_data(date=None):
         # remote_record_path: str = data['pullRecordUrls']  # 录音下载地址
         # TODO 当录音文件不存在时需要处理
         if data['pullRecordUrls']:
-            remote_record_path: str = data['pullRecordUrls'].replace('http://minio-7c27d1.camp-uat-upgrade:9000',
-                                                                     'http://10.18.110.120:30200')  # 录音下载地址
+            remote_record_path: str = data['pullRecordUrls'].replace(
+                'http://minio-7c27d1.camp-uat-upgrade:9000', 'http://10.18.110.120:30200').replace(
+                'http://minio-h0uat.csleasing.com.cn', 'http://10.18.110.120:30200')  # 录音下载地址
             # 示例 http://minio-7c27d1.camp-uat-upgrade:9000 \
             # /hzero-hzero-public/0/b7b735d91675483a9766c267aa6db191@hollyCrm-1625470045.244822.mp3
             uid = str(uuid.uuid1())
@@ -375,7 +381,7 @@ def start_request_data(date=None):
             data['business_type'] = business_type
             # 查询业务字段
             if data['customerPhone'] and business_type:
-                business_data: list[dict] = request_business_data(
+                business_data: List[dict] = request_business_data(
                     phone=data['customerPhone'],  # 填写客户号码
                     start_time=data['startTime'][:10],
                     end_time=data['endTime'][:10],
@@ -385,10 +391,10 @@ def start_request_data(date=None):
 
                 # 将业务数据拼接到数据列表中
                 # TODO 如果未匹配到业务数据的处理规则
-                data['business_data']: list[dict] = business_data
+                data['business_data']: List[dict] = business_data
             else:
                 log.error(f"客户号码: {data['customerPhone']} 或 坐席所属部门: {data['departmentName']}未匹配业务类型")
-                data['business_data']: list[dict] = []
+                data['business_data']: List[dict] = []
 
             # 将新的data添加到 data_list
             if data['record_dl_flag'] == 1:

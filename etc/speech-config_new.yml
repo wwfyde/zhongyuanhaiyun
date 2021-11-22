@@ -13,8 +13,8 @@ NMF2G729_BIN: '/usr/local/bin/nmf2G729'
   # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->单声道wav
   # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '2', '-ab', '128k', desWav]--->双声道wav
   # [ffmpeg_path, '-acodec', 'adpcm_ima_oki', '-f', 's16le', '-ar', '6000', '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->v3
-  # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->mp3
-  # [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '2', '-ab', '128k', desWav]--->aac
+# [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->mp3
+# [ffmpeg_path, '-i', srcPath, '-ar', '8000', '-ac', '2', '-ab', '128k', desWav]--->aac
 # [ffmpeg_path, '-acodec', 'adpcm_ima_oki', '-f', 's16le', '-ar', '8000', '-i', srcPath, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->vox
 # [ffmpeg_path, '-acodec', 'g729', '-f', 'g729' ,'-i', srcPath2, '-ar', '8000', '-ac', '1', '-ab', '128k', desWav]--->nmf
 
@@ -43,7 +43,13 @@ TASK_FILED: [ 'TASK_ID','RECORD_LIST','TASK_TIME','TASK_FLAG' , 'CUSTOMER_PHONE'
               'WORKFLOW', 'CALL_RESULT',  'AGENT_ID', 'AGENT_NAME',  'RELEVANT_AGENT',
               'CALL_NO', 'CALLED_NO', 'START_TIME', 'END_TIME', 'SUPPLIER_TYPE',
               'CALL_STATE', 'DEPARTMENT_NAME', 'BUSINESS_TYPE', 'HANGUPER', 'TOTAL_TIME',
-              'DROP_SIDE', 'RING_TIME',
+              'DROP_SIDE', 'RING_TIME', 'ORDER_NO', 'CONTRACT_NO', 'PRODUCT_NAME',
+              'CUSTOMER_NAME', 'APPLY_TIME', 'BUSINESS_TYPE_DESC', 'MARRIAGE_STATUS', 'CONTACT_NAME_DESC',
+              'DEALER_NO', 'DEALER_NAME', 'DEALER_ABBR', 'PREQUALIFICATION_LEVEL', 'CREDIT_REVIEW_RESULT',
+              'FINAL_APPROVAL_RESULT', 'HANDLE_TIME', 'APPLICATION_STATUS', 'BRAND_TYPE', 'CAR_LEVEL',
+              'FINANCE_BALANCE', 'APPLY_TYPE', 'BONDS_NAME', 'COLL_BACK_TYPE', 'CASE_END',
+              'NODE_NAME', 'ID_CARD_NO', 'CASE_DATE', 'CONTACT_NAME', 'CUSTOMER_PROBLEMS'
+
 ]
 
 # 任务维度映射值
@@ -74,8 +80,40 @@ TASK_FILED_MAP: {
 
     'DROP_SIDE': '挂机方向2',
     'RING_TIME': '来电时间',
+    'ORDER_NO': '订单编号',
+    'CONTRACT_NO': '合同编号',
+    'PRODUCT_NAME': '产品信息',
 
+    'CUSTOMER_NAME': '客户姓名',
+#    'CUSTOMER_PHONE': '客户电话',
+    'APPLY_TIME': '申请时间',
+    'BUSINESS_TYPE_DESC': '业务类型名称',
+    'MARRIAGE_STATUS': '婚姻状况',
+    'CONTACT_NAME_DESC': '人员类型',
 
+    'DEALER_NO': '经销商代码',
+    'DEALER_NAME': '经销商名称',
+    'DEALER_ABBR': '经销商简称',
+    'PREQUALIFICATION_LEVEL': '预审批等级',
+    'CREDIT_REVIEW_RESULT': '信审结果',
+
+    'FINAL_APPROVAL_RESULT': '终审结果',
+    'HANDLE_TIME': '处理时间',
+    'APPLICATION_STATUS': '申请状态',
+    'BRAND_TYPE': '是否LCV',
+    'CAR_LEVEL': '车辆级别',
+
+    'FINANCE_BALANCE': '客户融资余额',
+    'APPLY_TYPE': '公司性质',
+    'BONDS_NAME': '公户申请人',
+    'COLL_BACK_TYPE': '催收结果',
+    'CASE_END': '任务截止日期',
+
+    'NODE_NAME': '审批节点',
+    'ID_CARD_NO': '身份证号',
+    'CASE_DATE': '流入日期',
+    'CONTACT_NAME': '联系名称',
+    'CUSTOMER_PROBLEMS': '客户问题',
 }
 
 # 全部大写
