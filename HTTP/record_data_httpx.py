@@ -35,7 +35,8 @@ def request_record_data(start_date: str, end_date: str) -> list:
     # grant_type=client_credentials&client_secret=clcms-secret&client_id=clcms-client'
     try:
         access_token = 'Bearer ' + json.loads(
-            httpx.post(token_url, headers={'Content-type': 'application/x-www-form-urlencoded'}).text)['access_token']
+            httpx.post(token_url, headers={'Content-type': 'application/x-www-form-urlencoded'},
+                       timeout=40).text)['access_token']
 
         resp = httpx.post(url, json={
             "pathVariableMap": {
@@ -45,7 +46,7 @@ def request_record_data(start_date: str, end_date: str) -> list:
                 "startingTime": start_date,
                 "stopTime": end_date,
             },
-        }, headers={'Authorization': access_token})
+        }, headers={'Authorization': access_token}, timeout=40)
         # 似乎不需要replace \\
         r: dict = json.loads(resp.text)
         receive_data = []  #
@@ -153,13 +154,14 @@ def request_business_data(phone: str = '', start_time: str = '', end_time: str =
 
         result = json.loads(resp.text)
         if result['respCode'] == '0000':
-            business_data: List[dict] = result['data']['voiceQualityInspectionList']
-            log.info(f"获取录音质检业务数据成功, 录音数据: {str(business_data)}")
+            business_data = result['data']['voiceQualityInspectionList']
+            log.info(f"获取录音质检业务数据成功, 录音数据: {business_data}, result: {result}")
         else:
             business_data = []
             log.error(f"接口返回了错误的状态码, 状态码: {result['respCode']}, 状态错误提示: {result['respMsg']}")
     except httpx.ReadTimeout as exc:
         log.error("接口返回超时")
+        business_data = []
 
     except Exception as exc:
         log.error(f'获取录音质检业务数据失败, 请确认接口通信是否正常. \n错误提示: {exc}')
@@ -268,7 +270,7 @@ def push_datareceive(data_list):
     fail_count = 0
     for data in data_list:
         log.info(f"推送数据量：{len(data['task_info'])}")
-        resp = httpx.post(url=config["HTTP"]["DATA_RECEIVE_URL"], json=data)
+        resp = httpx.post(url=config["HTTP"]["DATA_RECEIVE_URL"], json=data, timeout=40)
         log.info(resp.json())
         if resp.json().get('CODE') != 20:
             fail_count += 1
@@ -285,7 +287,7 @@ def request_datareceive(data_list):
     fail_count = 0
     for data in data_list:
         log.info(f"推送数据量：{len(data['task_info'])}")
-        resp = httpx.post(config["HTTP"]["DATA_RECEIVE_URL"], json=data)
+        resp = httpx.post(config["HTTP"]["DATA_RECEIVE_URL"], json=data, timeout=40)
         log.info(resp.json())
         if resp.json().get('CODE') != 20:
             fail_count += 1

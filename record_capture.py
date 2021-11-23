@@ -138,7 +138,7 @@ def generate_data_1(data_list):
     task_info = []
     for item in data_list:
         data, record_info = {}, {}
-        record_data = item.copy()
+        item = item.copy()
         if len(item['business_data']):
             business_data: dict = item['business_data'][0].copy()  # 获取业务数据中的第一条
 
@@ -146,29 +146,29 @@ def generate_data_1(data_list):
             # record_info = item.copy()
 
             # 录音字典定制数据
-            record_info["record_id"] = record_data["callId"]  # 通话流水号
-            record_info['record_path'] = record_data['record_path']  # 本地录音地址
-            record_info["record_time"] = record_data["timestamp"]  # 录音开始时间
+            record_info["record_id"] = item["callId"]  # 通话流水号
+            record_info['record_path'] = item['record_path']  # 本地录音地址
+            record_info["record_time"] = item["timestamp"]  # 录音开始时间
             record_info["record_flag"] = '0'  # 录音状态标记
-            record_info['customer_phone'] = record_data['customerPhone']  # 客户电话
-            record_info['workflow'] = record_data['workflow']  # 通话流程 in: 呼入
-            record_info['call_result'] = record_data['callResult']  # 通话结果
-            record_info['agent_id'] = record_data['agentId']  # 客服ID
-            record_info['agent_name'] = record_data['agentNickName']  # 客服名称
-            record_info['relevant_agent'] = record_data['relevantAgent']  # 相关客服
-            record_info['call_no'] = record_data['callNo']  # 主叫号码
-            record_info['start_time'] = record_data['startTime']  # 通话开始时间
-            record_info['end_time'] = record_data['endTime']  # 通话结束时间
-            record_info['supplier_type'] = record_data['supplierType']  # 供应商类型
-            record_info['call_state'] = record_data['callState']  # 事件状态
-            record_info['department_name'] = record_data['departmentName']  # 坐席所属部门
-            record_info['business_type'] = record_data['business_type']  # 业务类型
-            record_info['hanguper'] = record_data['hanguper']  # 主叫方
+            record_info['customer_phone'] = item['customerPhone']  # 客户电话
+            record_info['workflow'] = item['workflow']  # 通话流程 in: 呼入
+            record_info['call_result'] = item['callResult']  # 通话结果
+            record_info['agent_id'] = item['agentId']  # 客服ID
+            record_info['agent_name'] = item['agentNickName']  # 客服名称
+            record_info['relevant_agent'] = item['relevantAgent']  # 相关客服
+            record_info['call_no'] = item['callNo']  # 主叫号码
+            record_info['start_time'] = item['startTime']  # 通话开始时间
+            record_info['end_time'] = item['endTime']  # 通话结束时间
+            record_info['supplier_type'] = item['supplierType']  # 供应商类型
+            record_info['call_state'] = item['callState']  # 事件状态
+            record_info['department_name'] = item['departmentName']  # 坐席所属部门
+            record_info['business_type'] = item['business_type']  # 业务类型
+            record_info['hanguper'] = item['hanguper']  # 主叫方
 
             # 构造业务字段
-            data["task_id"] = record_data["callId"]  # 任务流水号
-            data["record_list"] = record_data["callId"]  # 录音列表
-            data["task_time"] = record_data["timestamp"]  # 任务时间
+            data["task_id"] = item["callId"]  # 任务流水号
+            data["record_list"] = item["callId"]  # 录音列表
+            data["task_time"] = item["timestamp"]  # 任务时间
             data["task_flag"] = '0'  # 任务标记 用于后续处理过程状态迁移标记
 
             # 业务字典定制数据
@@ -184,6 +184,7 @@ def generate_data_1(data_list):
             data['dealer_no'] = business_data['dealerNo']  # 经销商代码
             data['dealer_name'] = business_data['dealerName']  # 经销商名称
             data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
+            # TODO 该字段没有
             data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
             data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
             data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
@@ -225,41 +226,40 @@ def generate_data(data_list):
     """
     task_info = []
     for item in data_list:
-        data, record_info = {}, {}
-        record_data = item.copy()
+        data, record_info = {}, {}  # 业务维度, 录音维度
         # TODO 将未序列化的数据页添加到字典
-        record_info = item.copy()
+        # record_info = item.copy()
         # 录音字典定制数据
-        record_info["record_id"] = record_data["callId"]  # 通话流水号
-        record_info['record_path'] = record_data['record_path']  # 本地录音地址
-        record_info["record_time"] = record_data["timestamp"]  # 录音开始时间
+        record_info["record_id"] = item["callId"]  # 通话流水号
+        record_info['record_path'] = item['record_path']  # 本地录音地址
+        record_info["record_time"] = item["timestamp"]  # 录音开始时间
         record_info["record_flag"] = '0'  # 录音状态标记
 
-        data['customer_phone'] = record_data['customerPhone']  # 客户电话
-        data['called_no'] = record_data['customerPhone']  # 客户电话
-        data['workflow'] = record_data['workflow']  # 通话流程 in: 呼入
-        data['call_result'] = record_data['callResult']  # 通话结果
-        data['agent_id'] = record_data['agentId']  # 客服ID
-        data['agent_name'] = record_data['agentNickName']  # 客服名称
-        data['relevant_agent'] = record_data['relevantAgent']  # 相关客服
-        data['call_no'] = record_data['callNo']  # 主叫号码
-        data['start_time'] = record_data['startTime']  # 通话开始时间
-        data['end_time'] = record_data['endTime']  # 通话结束时间
-        data['supplier_type'] = record_data['supplierType']  # 供应商类型
-        data['call_state'] = record_data['callState']  # 事件状态
-        data['department_name'] = record_data['departmentName']  # 坐席所属部门
-        data['business_type'] = record_data['business_type']  # 业务类型
-        data['hanguper'] = record_data['hanguper']  # 主叫方
+        data['customer_phone'] = item['customerPhone']  # 客户电话
+        data['called_no'] = item['customerPhone']  # 客户电话
+        data['workflow'] = item['workflow']  # 通话流程 in: 呼入
+        data['call_result'] = item['callResult']  # 通话结果
+        data['agent_id'] = item['agentId']  # 客服ID
+        data['agent_name'] = item['agentNickName']  # 客服名称
+        data['relevant_agent'] = item['relevantAgent']  # 相关客服
+        data['call_no'] = item['callNo']  # 主叫号码
+        data['start_time'] = item['startTime']  # 通话开始时间
+        data['end_time'] = item['endTime']  # 通话结束时间
+        data['supplier_type'] = item['supplierType']  # 供应商类型
+        data['call_state'] = item['callState']  # 事件状态
+        data['department_name'] = item['departmentName']  # 坐席所属部门
+        data['business_type'] = item['business_type']  # 业务类型
+        data['hanguper'] = item['hanguper']  # 主叫方
 
         # 20211109 新增
-        data['total_time'] = record_data['totalTime']  # 通话时长: 秒
-        data['drop_side'] = record_data['dropSide']  # 挂机方向 为空
-        data['ring_time'] = record_data['agentRingAt']  # 来电时间, 响铃时间
+        data['total_time'] = item['totalTime']  # 通话时长: 秒
+        data['drop_side'] = item['dropSide']  # 挂机方向 为空
+        data['ring_time'] = item['agentRingAt']  # 来电时间, 响铃时间
 
         # 构造业务字段
-        data["task_id"] = record_data["callId"]  # TODO 任务流水号 可以自动生成
-        data["record_list"] = record_data["callId"]  # 录音列表
-        data["task_time"] = record_data["timestamp"]  # 任务时间
+        data["task_id"] = item["callId"]  # TODO 任务流水号 可以自动生成
+        data["record_list"] = item["callId"]  # 录音列表
+        data["task_time"] = item["timestamp"]  # 任务时间
         data["task_flag"] = '0'  # 任务标记 用于后续处理过程状态迁移标记
 
         # TODO 业务字段 当接口通了或生产环境时需要匹配
@@ -279,6 +279,7 @@ def generate_data(data_list):
             data['dealer_name'] = business_data['dealerName']  # 经销商名称
             data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
             data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
+
             data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
             data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
             data['handle_time'] = business_data['handleTime']  # 处理时间
@@ -298,13 +299,13 @@ def generate_data(data_list):
             data['case_date'] = business_data['caseDate']  # 流入日期
             data['contact_name'] = business_data['contactName']  # 流入日期
 
+            # 设置与任务相关的录音信息列表
+            data["record_info"] = [record_info]  # 构造录音字段数据
+            task_info.append(data)
         else:
             # TODO 需要添加到失败队列
-            log.error("未匹配到相关业务接口数据")
+            log.error("未匹配到相关业务接口数据, 将不会推送")
 
-        # 设置与任务相关的录音信息列表
-        data["record_info"] = [record_info]  # 构造录音字段数据
-        task_info.append(data)
     log.info(f"已生成 {len(task_info)} 条任务数据")
     # 将task_info数据列表按照 SEND_SIZE 配置项分割成多个部分
     send_size = config["HTTP"]["SEND_SIZE"]
@@ -369,6 +370,8 @@ def start_capture(append_date=None):
             log.info("无数据需要推送，程序结束...")
             return
         log.info(f"获取数据量：{len(data_list)}")
+
+        # TODO 处理失败的数据
         # record_list, failed_data_list = parse_path(data_list)
         # log.info(f"滤除空路径后的数据量：{len(record_list)}")
         # log.info(f"无对应录音文件的数据量：{len(failed_data_list)}")
@@ -383,6 +386,7 @@ def start_capture(append_date=None):
             return
         mapping_fields(data_list)  # TODO 是否需要映射字段
         data_list = generate_data(data_list)
+        log.info(f'将数据推送到抽音框架, 数据列表: {data_list}')
         request_datareceive(data_list)
     except Exception as e:
         log.error("抽音程序异常")
