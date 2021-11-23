@@ -389,10 +389,17 @@ def start_request_data(date=None):
             # 查询业务字段
             if data['customerPhone'] and business_type:
                 # 根据呼叫类型和主被叫号码来判断客户号码
+                if data['workflow'] == 'normal':
+                    phone = data['callNo']
+                elif data['workflow'] == 'dialout':
+                    phone = data['customerPhone']
+                else:
+                    phone = data['customerPhone']
+
                 business_data = request_business_data(
-                    phone=data['customerPhone'],  # 填写客户号码
-                    start_time=data['startTime'],
-                    end_time=data['endTime'],
+                    phone=phone,  # 填写客户号码
+                    start_time=data['startTime'][:10],
+                    end_time=data['endTime'][:10],
                     business_type=business_type,
                     agent_name=data['agentNickName']
                 )
