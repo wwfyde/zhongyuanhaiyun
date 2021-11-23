@@ -12,7 +12,7 @@ HTTP:
   # 抽音服务内部数据推送接口url
   DATA_RECEIVE_URL: http://localhost:9000/datareceive
   # 推送内部接口单位数据量
-  SEND_SIZE: 1000
+  SEND_SIZE: 10
   # 录音或推送数据保存路径
   DATA_PATH: record_file
 

@@ -285,9 +285,9 @@ def request_datareceive(data_list):
     :param data_list: 符合规范的数据列表
     """
     fail_count = 0
+    log.info(f'推送任务将分: {len(data_list)}次推送')
     for data in data_list:
         log.info(f"推送数据量：{len(data['task_info'])}")
-        log.info(f"当前推送的数据: {data}")
         resp = httpx.post(config["HTTP"]["DATA_RECEIVE_URL"], json=data, timeout=40)
         log.info(resp.json())
         if resp.json().get('CODE') != 20:
@@ -388,10 +388,18 @@ def start_request_data(date=None):
             data['business_type'] = business_type
             # 查询业务字段
             if data['customerPhone'] and business_type:
+                # 根据呼叫类型和主被叫号码来判断客户号码
+                if data['workflow'] == 'normal':
+                    phone = data['callNo']
+                elif data['workflow'] == 'dialout':
+                    phone = data['customerPhone']
+                else:
+                    phone = data['customerPhone']
+
                 business_data = request_business_data(
-                    phone=data['customerPhone'],  # 填写客户号码
-                    start_time=data['startTime'][:10],
-                    end_time=data['endTime'][:10],
+                    phone=phone,  # 填写客户号码
+                    start_time=data['startTime'],
+                    end_time=data['endTime'],
                     business_type=business_type,
                     agent_name=data['agentNickName']
                 )
