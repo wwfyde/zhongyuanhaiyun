@@ -232,11 +232,11 @@ def generate_data(data_list):
         "if_convert": "yes"
     }
     data_list = []
-    for task_info in task_info_sep:
+    for task_infos in task_info_sep:
         data = data_tmpl.copy()
-        data["task_info"] = task_info
+        data["task_info"] = task_infos
         data_list.append(data)
-    return data_list
+    return data_list, len(task_info)
 
 
 def err_handler(request, exception):
@@ -274,12 +274,14 @@ def start_capture(append_date=None):
         else:
             # 手动补数
             log.info(f"根据日期: {append_date}手动补数")
-            data_list = start_request_data(append_date)
+            data_list = start_request_data(append_date)  # 请求业务数据
             # data_list = get_data_from_file(append_date, 'total_records.txt')
+
         if not data_list:
             log.info("无数据需要推送，程序结束...")
             return
-        log.info(f"获取数据量：{len(data_list)}")
+        call_record_count = len(data_list)
+        log.info(f"共获取通话记录(含录音文件)：{call_record_count}条")
 
         # TODO 处理失败的数据
         # record_list, failed_data_list = parse_path(data_list)
@@ -295,8 +297,9 @@ def start_capture(append_date=None):
             log.info("不存在有录音文件的数据，程序结束...")
             return
         mapping_fields(data_list)  # TODO 是否需要映射字段
-        data_list = generate_data(data_list)
+        data_list, task_info_count = generate_data(data_list)
         # log.info(f'将数据推送到抽音框架, 数据列表: {data_list}')
+        log.info(f"共获取录音文件 {call_record_count}条, 成功匹配业务数据{task_info_count}条")
         request_datareceive(data_list)
     except Exception as e:
         log.error("抽音程序异常")
@@ -322,7 +325,7 @@ def append_failed(date):
             log.info("不存在有录音文件的数据，程序结束...")
             return
         mapping_fields(record_list)
-        data_list = generate_data(record_list)
+        data_list, task_info_count = generate_data(record_list)
         request_datareceive(data_list)
     except Exception as e:
         log.error("抽音程序异常")
