@@ -287,6 +287,7 @@ def request_datareceive(data_list):
     fail_count = 0
     for data in data_list:
         log.info(f"推送数据量：{len(data['task_info'])}")
+        log.info(f"当前推送的数据: {data}")
         resp = httpx.post(config["HTTP"]["DATA_RECEIVE_URL"], json=data, timeout=40)
         log.info(resp.json())
         if resp.json().get('CODE') != 20:
@@ -309,9 +310,12 @@ def start_request_data(date=None):
     if date:
         start_time = date + ' ' + '00:00:00'
         end_time = date + ' ' + '23:59:59'
+        local_record_path_prefix = os.path.join(config['PREFIX_PATH'], date)
+
     else:
         start_time = yesterday.strftime('%Y-%m-%d') + ' ' + '00:00:00'
         end_time = yesterday.strftime('%Y-%m-%d') + ' ' + '23:59:59'
+        local_record_path_prefix = os.path.join(config['PREFIX_PATH'], yesterday.strftime('%Y-%m-%d'))
 
     # 根据当前时间获取最近一天的录音通话记录数据
     receive_data = request_record_data(start_time, end_time)
@@ -336,8 +340,9 @@ def start_request_data(date=None):
             file_name = uid + '.' + remote_record_path.split('.')[-1]  # 使用call-id
 
             # TODO 按照 年-月-日/ call_uuid 存储数据
-            yesterday_date = yesterday.strftime('%Y-%m-%d')
-            local_record_path_prefix = os.path.join(config['PREFIX_PATH'], yesterday_date)
+            # yesterday_date = yesterday.strftime('%Y-%m-%d')
+
+            # local_record_path_prefix = os.path.join(config['PREFIX_PATH'], yesterday_date)
             if not os.path.exists(local_record_path_prefix):
                 # 按照日期创建录音文件夹
                 os.makedirs(local_record_path_prefix)
@@ -383,7 +388,7 @@ def start_request_data(date=None):
             data['business_type'] = business_type
             # 查询业务字段
             if data['customerPhone'] and business_type:
-                business_data: List[dict] = request_business_data(
+                business_data = request_business_data(
                     phone=data['customerPhone'],  # 填写客户号码
                     start_time=data['startTime'][:10],
                     end_time=data['endTime'][:10],
@@ -393,10 +398,10 @@ def start_request_data(date=None):
 
                 # 将业务数据拼接到数据列表中
                 # TODO 如果未匹配到业务数据的处理规则
-                data['business_data']: List[dict] = business_data
+                data['business_data'] = business_data
             else:
                 log.error(f"客户号码: {data['customerPhone']} 或 坐席所属部门: {data['departmentName']}未匹配业务类型")
-                data['business_data']: List[dict] = []
+                data['business_data'] = []
 
             # 将新的data添加到 data_list
             if data['record_dl_flag'] == 1:
