@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 
 import httpx
+import pymysql
 import requests
 from typing import List
 
@@ -27,6 +28,7 @@ def request_record_data(start_date: str, end_date: str) -> list:
     """
     url: str = config["HTTP"]["DATA_REQUEST_URL"]
     token_url: str = config["HTTP"]["TOKEN_ACCESS_URL"]
+    page_size: str = config["HTTP"]["PAGE_SIZE"]
     # 测试时启用
 
     # url = 'http://gateway.clmp-uat.csleasing.com.cn/hitf/v1/rest/invoke?namespace=HZERO
@@ -38,6 +40,7 @@ def request_record_data(start_date: str, end_date: str) -> list:
             httpx.post(token_url, headers={'Content-type': 'application/x-www-form-urlencoded'},
                        timeout=40).text)['access_token']
 
+        # TODO 需要进行分页处理下载
         resp = httpx.post(url, json={
             "pathVariableMap": {
                 "organizationId": 0
@@ -45,6 +48,7 @@ def request_record_data(start_date: str, end_date: str) -> list:
             "requestParamMap": {
                 "startingTime": start_date,
                 "stopTime": end_date,
+                "pageSize": page_size,
             },
         }, headers={'Authorization': access_token}, timeout=40)
         # 似乎不需要replace \\
@@ -52,7 +56,27 @@ def request_record_data(start_date: str, end_date: str) -> list:
         receive_data = []  #
         if str(r["status"]) == "200":
             receive_data: list = json.loads(r["payload"])["content"]
-            log.info(f"获取录音记录列表成功, 录音列表: {receive_data}, 共 [{len(receive_data)}]条记录")
+            total_pages = int(json.loads(r["payload"])["totalPages"])
+            total_elements = int(json.loads(r["payload"])["totalElements"])
+            if total_pages > 1:
+                for start_page in range(2, total_pages+1):
+                    resp2 = httpx.post(url, json={
+                        "pathVariableMap": {
+                            "organizationId": 0
+                        },
+                        "requestParamMap": {
+                            "startingTime": start_date,
+                            "stopTime": end_date,
+                            "startPage": start_page,
+                            "pageSize": page_size,
+                        },
+                    }, headers={'Authorization': access_token}, timeout=40)
+                    # 似乎不需要replace \\
+                    r2: dict = json.loads(resp2.text)
+                    receive_data.extend(json.loads(r2["payload"])["content"])
+
+            log.info(f"获取录音记录列表成功, 实际共获取 [{len(receive_data)}]条记录, 工分 {total_pages} 页数据, "
+                     f"接口共 {total_elements}条记录")
             # for data in receive_data_raw:
             #     item = dict(
             #
@@ -319,25 +343,46 @@ def start_request_data(date=None):
 
     # 根据当前时间获取最近一天的录音通话记录数据
     receive_data = request_record_data(start_time, end_time)
-    log.info(f"正在获取日期: {start_time[:10]}的数据, 请求随录数据成功: {receive_data}")
+    log.info(f"正在获取日期: {start_time[:10]}的数据, 共 {len(receive_data)} 条, 请求随录数据成功: {receive_data}, ")
 
     # 格式化随录数据
 
     data_list = []  # 保存序列化后的数据
 
     # 下载录音文件并更新录音地址 更新数据
+
     for data in receive_data:
 
         # remote_record_path: str = data['pullRecordUrls']  # 录音下载地址
         # TODO 当录音文件不存在时需要处理
-        if data['pullRecordUrls']:
+        if data['pullRecordUrls'] and data['callResult'] == 'dealing':
             remote_record_path: str = data['pullRecordUrls'].replace(
                 'http://minio-7c27d1.camp-uat-upgrade:9000', 'http://10.18.110.120:30200').replace(
                 'http://minio-h0uat.csleasing.com.cn', 'http://10.18.110.120:30200')  # 录音下载地址
             # 示例 http://minio-7c27d1.camp-uat-upgrade:9000 \
             # /hzero-hzero-public/0/b7b735d91675483a9766c267aa6db191@hollyCrm-1625470045.244822.mp3
-            uid = str(uuid.uuid1())
-            file_name = uid + '.' + remote_record_path.split('.')[-1]  # 使用call-id
+
+            # TODO 获取数据类型
+            # TODO 确定业务类型规则  根据坐席所属部门确定业务类型
+            log.info(f"坐席所属部门: [{data['departmentName']}].")
+            if data['departmentName'] == '风险管理部':
+                business_type = 'CREDIT_REVIEW'  # 信审
+            elif data['departmentName'] == '客户服务部':
+                business_type = 'CUSTOMER_SERVICE'  # 客服
+            elif data['departmentName'] == '资产管理部':
+                business_type = 'COLLECTION'  # 催收
+            # TODO 需要确定是否还有其他的部门名称或类型
+            else:
+                log.info(f"未识别的部门: {data['departmentName']}, 通话流水号: {data['callId']}")
+                business_type = 'unknown'
+
+            # 添加业务类型到字典
+            data['business_type'] = business_type
+
+            uid = str(uuid.uuid1()).replace('-', '')
+            # 文件格式: 业务类型 + 日期 + uid + 通话ID
+            file_name = f"{business_type}-{data['startTime'][:10].replace('-', '')}-{data['callId']}-{uid}" \
+                        f".{remote_record_path.split('.')[-1]}"  # " \
 
             # TODO 按照 年-月-日/ call_uuid 存储数据
             # yesterday_date = yesterday.strftime('%Y-%m-%d')
@@ -358,10 +403,19 @@ def start_request_data(date=None):
                 if status:
                     # 下载成功
                     # TODO 更新录音地址
-                    log.info(f'通话流水号: {data["callId"]}, 录音文件下载成功,本地地址: {local_record_path}!')
-                    data['record_path'] = local_record_path
-                    data['record_uuid'] = uid
-                    data['record_dl_flag'] = 1
+                    file_size = os.stat(local_record_path).st_size
+                    if file_size == 0:
+                        log.warning(f'录音文件为空, ')
+                        status = -1  # 重置录音状态 不
+                        data['record_path'] = local_record_path
+                        data['record_uuid'] = uid
+                        data['record_dl_flag'] = -1
+                    else:
+
+                        log.info(f'通话流水号: {data["callId"]}, 录音文件下载成功,本地地址: {local_record_path}!')
+                        data['record_path'] = local_record_path
+                        data['record_uuid'] = uid
+                        data['record_dl_flag'] = 1
                     break
 
                 else:
@@ -370,22 +424,6 @@ def start_request_data(date=None):
                     i = i + 1
             pass
 
-            # TODO 获取数据类型
-            # TODO 确定业务类型规则  根据坐席所属部门确定业务类型
-            log.info(f"坐席所属部门: [{data['departmentName']}].")
-            if data['departmentName'] == '风险管理部':
-                business_type = 'CREDIT_REVIEW'  # 信审
-            elif data['departmentName'] == '客户服务部':
-                business_type = 'CUSTOMER_SERVICE'  # 客服
-            elif data['departmentName'] == '资产管理部':
-                business_type = 'COLLECTION'  # 催收
-            # TODO 需要确定是否还有其他的部门名称或类型
-            else:
-                log.info(f"未识别的部门: {data['departmentName']}, 通话流水号: {data['callId']}")
-                business_type = ''
-
-            # 添加业务类型到字典
-            data['business_type'] = business_type
             # 查询业务字段
             if data['customerPhone'] and business_type:
                 # 根据呼叫类型和主被叫号码来判断客户号码
@@ -406,14 +444,38 @@ def start_request_data(date=None):
 
                 # 将业务数据拼接到数据列表中
                 # TODO 如果未匹配到业务数据的处理规则
+                if len(business_data) > 0:
+                    business_flag = 1
+                else:
+                    business_flag = -1
                 data['business_data'] = business_data
             else:
                 log.error(f"客户号码: {data['customerPhone']} 或 坐席所属部门: {data['departmentName']}未匹配业务类型")
                 data['business_data'] = []
+                business_flag = -2
 
             # 将新的data添加到 data_list
-            if data['record_dl_flag'] == 1:
+            # TODO 将任务处理状态添加到数据库
+            with pymysql.connect(host=config['MYSQL']['host'],
+                                 port=config['MYSQL']['port'],
+                                 user=config['MYSQL']['user'],
+                                 passwd=config['MYSQL']['passwd'],
+                                 db=config['MYSQL']['db']
+                                 ) as conn:
+                with conn.cursor() as cur:
+                    insert_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+                    cur.execute("insert into records values "
+                                "(default, %d, %d, %s, %s,"
+                                "%s, %s, %s, %s, %s,"
+                                "%s, %s, %s, %s, %s)", (data['record_dl_flag'], business_flag, data['callId'],
+                                                        data['startTime'], insert_time, business_type,
+                                                        data['callResult'], data['departmentName'],
+                                                        data['customerPhone'],
+                                                        data['agentNickName'], data['startTime'], data['endTime'],
+                                                        data['workflow'], data['hanguper']))
+                conn.commit()
 
+            if data['record_dl_flag'] == 1 and business_flag == 1:
                 data_list.append(data)
             # TODO 下载失败的数据处理规则
             else:

@@ -6,13 +6,14 @@ HTTP:
   # 录音质检接口URL
 #  RECORD_QC_URL: http://open-dev.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
   RECORD_QC_URL:  http://open.csleasing.com.cn/uop/ecar/v1/voice/queryVoice
-
+  # 按照页数查询
+  PAGE_SIZE: 100
   # 录音下载url
   #  RECORD_URL: http://192.168.6.5:8080/AgentRec/
   # 抽音服务内部数据推送接口url
   DATA_RECEIVE_URL: http://localhost:9000/datareceive
   # 推送内部接口单位数据量
-  SEND_SIZE: 10
+  SEND_SIZE: 1000
   # 录音或推送数据保存路径
   DATA_PATH: record_file
 
@@ -30,15 +31,15 @@ LOG:
 TIMER:
   # 数据抽取定时任务时间
   CAPTURE_SEC: 0
-  CAPTURE_MIN: '*'
-  CAPTURE_HOUR: '*'
+  CAPTURE_MIN: 0
+  CAPTURE_HOUR: 1
   # 重推失败数据定时任务时间
   FAILED_SEC: 0
-  FAILED_MIN: '*'
-  FAILED_HOUR: '*'
+  FAILED_MIN: 0
+  FAILED_HOUR: 2
   # 文件清理定时任务时间
   CLEAR_SEC: 0
-  CLEAR_MIN: 0
+  CLEAR_MIN: 5
   CLEAR_HOUR: 1
   # 下载的录音文件保存时间
   RECORD_STORAGE_DAYS: 30
@@ -49,7 +50,7 @@ MYSQL:
   port: 3306
   user: root
   passwd: Pachira@123
-  db: sddl
+  db: custom_data_capture
 
 # 抽取数据相关的sql
 SQL:

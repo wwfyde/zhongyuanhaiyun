@@ -1,11 +1,14 @@
 import json
 import os
 import sys
+import time
 from math import ceil
 
 import httpx
 
 # 通过MySQL数据库导入
+import pymysql
+
 from DB.mysql_base import MysqlBase
 from HTTP.record_data_httpx import start_request_data
 from MQ.publish_worker_pika import PublishWorker
@@ -102,7 +105,7 @@ def parse_path(data_list):
             record_path_list = [path for path in total_record_path_list if data["calluuid"] in path]
             if record_path_list:
                 if len(record_path_list) > 1:
-                    log.warning("当前业务含有多个录音文件，connid："+data.get("connid"))
+                    log.warning("当前业务含有多个录音文件，connid：" + data.get("connid"))
                 data["record_path"] = record_path_list[0]
                 new_data_list.append(data)
             else:
@@ -130,7 +133,7 @@ def mapping_fields(data_list):
             data['hanguper'] = '坐席挂机'
 
 
-def generate_data(data_list):
+def generate_data(data_list, data_channel):
     """
     生成符合接口规范的数据, 并且子列表每条最大1000条数据
     """
@@ -142,11 +145,18 @@ def generate_data(data_list):
         # 录音字典定制数据
         record_info["record_id"] = item["callId"]  # 通话流水号
         record_info['record_path'] = item['record_path']  # 本地录音地址
-        record_info["record_time"] = item["timestamp"]  # 录音开始时间
+        record_info["record_time"] = item["startTime"]  # 录音开始时间
         record_info["record_flag"] = '0'  # 录音状态标记
 
-        data['customer_phone'] = item['customerPhone']  # 客户电话
-        data['called_no'] = item['customerPhone']  # 客户电话
+        if item['workflow'] == '呼入':
+
+            data['customer_phone'] = item['callNo']  # 客户电话
+        elif item['workflow'] == '呼出':
+            data['customer_phone'] = item['customerPhone']
+        else:
+            data['customer_phone'] = item['customerPhone']
+
+        data['called_no'] = item['customerPhone']  # 被叫号码
         data['workflow'] = item['workflow']  # 通话流程 in: 呼入
         data['call_result'] = item['callResult']  # 通话结果
         data['agent_id'] = item['agentId']  # 客服ID
@@ -169,7 +179,7 @@ def generate_data(data_list):
         # 构造业务字段
         data["task_id"] = item["callId"]  # TODO 任务流水号 可以自动生成
         data["record_list"] = item["callId"]  # 录音列表
-        data["task_time"] = item["timestamp"]  # 任务时间
+        data["task_time"] = item["startTime"]  # 任务时间
         data["task_flag"] = '0'  # 任务标记 用于后续处理过程状态迁移标记
 
         # TODO 业务字段 当接口通了或生产环境时需要匹配
@@ -188,7 +198,8 @@ def generate_data(data_list):
             data['dealer_no'] = business_data['dealerNo']  # 经销商代码
             data['dealer_name'] = business_data['dealerName']  # 经销商名称
             data['dealer_abbr'] = business_data['dealerAbbreviationName']  # 经销商简称
-            data['prequalification_level'] = business_data['prequalificationLevel']  # 预审批等级
+            data['prequalification_level'] = business_data['preApprovalLevel']  # 预审批等级
+            # data['prequalification_level'] = business_data.get('preApprovalLevel', '')  # 预审批等级
 
             data['credit_review_result'] = business_data['creditReviewResult']  # 信审决策结果
             data['final_approval_result'] = business_data['finalApprovalResult']  # 最终审批结果
@@ -210,7 +221,27 @@ def generate_data(data_list):
             data['contact_name'] = business_data['contactName']  # 流入日期
 
             # 设置与任务相关的录音信息列表
-            data["record_info"] = [record_info]  # 构造录音字段数据
+            # TODO 如果是信审数据, 从数据库中查询所有历史录音
+            if data['business_type_desc'] == '信审':
+                with pymysql.connect(host=config['MYSQL']['host'],
+                                     port=config['MYSQL']['port'],
+                                     user=config['MYSQL']['user'],
+                                     passwd=config['MYSQL']['passwd'],
+                                     db=config['MYSQL']['db']) as conn:
+                    with conn.cursor() as cur:
+                        cur.execute('select record_id, record_path, record_time, record_flag '
+                                    'from credit_review '
+                                    'where id_card_no = %s and order_no = %s', (data['id_card_no'], data['order_no']))
+                        record_info_extend = []
+                        for item in cur.fetchall():
+                            record_info_extend.append(dict(record_id=item[0], record_path=item[1], record_time=item[
+                                2], record_flag=item[3]))
+
+                        data["record_info"] = [record_info]  # 构造录音字段数据
+                        # 将历史录音添加到该任务中
+                        data["record_info"].extend(record_info_extend)
+            else:
+                data["record_info"] = [record_info]  # 构造录音字段数据
             task_info.append(data)
         else:
             # TODO 需要添加到失败队列
@@ -223,10 +254,11 @@ def generate_data(data_list):
     task_info_sep = [task_info[i * send_size:(i + 1) * send_size] for i in
                      range(ceil(len(task_info) / send_size))]
     # 生成接口数据
+    # TODO 需要根据 业务类型来判断
     data_tmpl = {
         "data_type": "speech",
         "data_treatment": "batch",
-        "data_channel": "zyhy",  # TODO zyhy 录音转码命令中需要用到
+        "data_channel": data_channel,  # TODO zyhy 录音转码命令中需要用到
         "accesskey_id": "asdf",
         "secret": "123456",
         "if_convert": "yes"
@@ -297,10 +329,69 @@ def start_capture(append_date=None):
             log.info("不存在有录音文件的数据，程序结束...")
             return
         mapping_fields(data_list)  # TODO 是否需要映射字段
-        data_list, task_info_count = generate_data(data_list)
-        # log.info(f'将数据推送到抽音框架, 数据列表: {data_list}')
-        log.info(f"共获取录音文件 {call_record_count}条, 成功匹配业务数据{task_info_count}条")
-        request_datareceive(data_list)
+        # TODO
+        data_list1, data_list2, data_list3 = [], [], []
+        for data in data_list:
+            if data['business_type'] == 'CREDIT_REVIEW':
+                data_list1.append(data)
+            elif data['business_type'] == 'CUSTOMER_SERVICE':
+                data_list2.append(data)
+            elif data['business_type'] == 'COLLECTION':
+                data_list3.append(data)
+            else:
+                log.info("未识别的业务类型")
+
+        # TODO 信审类型的数据需要特殊处理并持久化到数据库
+        conn = pymysql.connect(host=config['MYSQL']['host'],
+                               port=config['MYSQL']['port'],
+                               user=config['MYSQL']['user'],
+                               passwd=config['MYSQL']['passwd'],
+                               db=config['MYSQL']['db']
+                               )
+        data_list_xs = []
+        for xs_data in data_list1:
+            if len(xs_data['business_data']) > 0:
+                business_data = xs_data['business_data'][0]
+                if business_data['nodeName'] in ('待确认合同生成', '确认合同生成', '合同确认中') and business_data[
+                    'finalApprovalResult'] == '通过':
+                    data_list_xs.append(xs_data)
+                    pass
+                else:
+                    # 信审未通过, 持久化到数据库中
+                    with conn:
+                        with conn.cursor() as cur:
+                            cur.execute('insert into credit_review values (default, %s, %s, %s, %s, %s, %s)',
+                                        (business_data['orderNo'],
+                                         business_data['idCardNo'],
+                                         xs_data['callId'],
+                                         xs_data['record_path'],
+                                         xs_data['startTime'],
+                                         '0'))
+                        conn.commit()
+            else:
+                # 未通过的需要持久化到数据库
+                # cur.execute('insert into credit_review values ')
+
+                pass
+
+            pass
+        current_date = time.strftime('%Y-%m-%d', time.localtime())
+        # 每天尝试删除超过10天且未通过的信审数据
+        cur.execute(f'delete credit_review where datediff({current_date}, start_time) > 10 ')
+        # 获取已通过列表的历史数据
+        # conn.commit()
+        cur.close()
+        conn.close()
+        # TODO 每日删除录音日期超过10天的数据
+
+        # log.info(f'将数据推送到抽音框架, 数据列表: 信审-{data_list1}, 客服-{data_list2}, 催收-{data_list3}')
+        data_list1, task_info_count1 = generate_data(data_list1, 'zyhy_xs')
+        data_list2, task_info_count2 = generate_data(data_list2, 'zyhy_kf')
+        data_list3, task_info_count3 = generate_data(data_list3, 'zyhy_cs')
+        log.info(f"共获取录音文件 {call_record_count}条, 成功匹配业务数据{task_info_count1 + task_info_count2 + task_info_count3}条")
+        request_datareceive(data_list1)
+        request_datareceive(data_list2)
+        request_datareceive(data_list3)
     except Exception as e:
         log.error("抽音程序异常")
         log.error(e, exc_info=1)

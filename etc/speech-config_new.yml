@@ -22,7 +22,10 @@ NMF2G729_BIN: '/usr/local/bin/nmf2G729'
 #value:转码命令
 #TODO  不同渠道采用不同命令 key为渠道名
 # 20211118 单声道改成了双声道 -ac 2
-CMDCOMMANDS: { 'zyhy': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '2', '-ab', '128k', 'desWav' ],
+CMDCOMMANDS: {
+    'zyhy_xs': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '1', '-ab', '128k', 'desWav' ],
+    'zyhy_kf': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '1', '-ab', '128k', 'desWav' ],
+    'zyhy_cs': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '2', '-ab', '128k', 'desWav' ],
 }
 
 # LOG路径&级别
