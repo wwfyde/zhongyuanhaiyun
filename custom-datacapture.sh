@@ -1,4 +1,5 @@
 #!/bin/bash
+source /mydata/venv/bin/activate
 
 cd `dirname $0`
 BASE_DIR="`pwd`"

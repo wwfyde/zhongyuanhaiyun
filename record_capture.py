@@ -232,14 +232,18 @@ def generate_data(data_list, data_channel):
                         cur.execute('select distinct record_id, record_path, record_time, record_flag '
                                     'from credit_review '
                                     'where id_card_no = %s and order_no = %s', (data['id_card_no'], data['order_no']))
-                        record_info_extend = []
-                        for item in cur.fetchall():
-                            record_info_extend.append(dict(record_id=item[0], record_path=item[1], record_time=item[
-                                2], record_flag=item[3]))
+                        record_info_extend, extra_record_list = [], [item["callId"]]
+                        for item2 in cur.fetchall():
+                            record_info_extend.append(dict(record_id=item2[0], record_path=item2[1], record_time=item2[
+                                2], record_flag=item2[3]))
+                            extra_record_list.append(item2[0])
 
                         data["record_info"] = [record_info]  # 构造录音字段数据
                         # 将历史录音添加到该任务中
                         data["record_info"].extend(record_info_extend)
+                        # 需要重新构造录音列表
+                        # 重写 record_list 重新构造录音列表
+                        data['reccord_list'] = ','.join(extra_record_list)
 
                         # 删除相应不通过数据
                         cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
