@@ -229,7 +229,7 @@ def generate_data(data_list, data_channel):
                                      passwd=config['MYSQL']['passwd'],
                                      db=config['MYSQL']['db']) as conn:
                     with conn.cursor() as cur:
-                        cur.execute('select record_id, record_path, record_time, record_flag '
+                        cur.execute('select distinct record_id, record_path, record_time, record_flag '
                                     'from credit_review '
                                     'where id_card_no = %s and order_no = %s', (data['id_card_no'], data['order_no']))
                         record_info_extend = []
@@ -240,11 +240,16 @@ def generate_data(data_list, data_channel):
                         data["record_info"] = [record_info]  # 构造录音字段数据
                         # 将历史录音添加到该任务中
                         data["record_info"].extend(record_info_extend)
+
+                        # 删除相应不通过数据
+                        cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
+                                    (data['id_card_no'], data['order_no']))
+                    conn.commit()
             else:
                 data["record_info"] = [record_info]  # 构造录音字段数据
             task_info.append(data)
         else:
-            # TODO 需要添加到失败队列
+            # 该代码默认不会执行
             log.error("未匹配到相关业务接口数据, 将不会推送")
 
     log.info(f"已生成 {len(task_info)} 条任务数据")
@@ -331,6 +336,8 @@ def start_capture(append_date=None):
         mapping_fields(data_list)  # TODO 是否需要映射字段
         # TODO
         data_list1, data_list2, data_list3 = [], [], []
+
+        # 根据业务类型将数据分类
         for data in data_list:
             if data['business_type'] == 'CREDIT_REVIEW':
                 data_list1.append(data)
@@ -342,23 +349,21 @@ def start_capture(append_date=None):
                 log.info("未识别的业务类型")
 
         # TODO 信审类型的数据需要特殊处理并持久化到数据库
-        conn = pymysql.connect(host=config['MYSQL']['host'],
-                               port=config['MYSQL']['port'],
-                               user=config['MYSQL']['user'],
-                               passwd=config['MYSQL']['passwd'],
-                               db=config['MYSQL']['db']
-                               )
         data_list_xs = []
         for xs_data in data_list1:
             if len(xs_data['business_data']) > 0:
                 business_data = xs_data['business_data'][0]
-                if business_data['nodeName'] in ('待确认合同生成', '确认合同生成', '合同确认中') and business_data[
-                    'finalApprovalResult'] == '通过':
+                if business_data['finalApprovalResult'] == '通过' and business_data['creditReviewResult'] in ('通过',
+                                                                                                            '审批中'):
                     data_list_xs.append(xs_data)
-                    pass
                 else:
                     # 信审未通过, 持久化到数据库中
-                    with conn:
+                    with pymysql.connect(host=config['MYSQL']['host'],
+                                         port=config['MYSQL']['port'],
+                                         user=config['MYSQL']['user'],
+                                         passwd=config['MYSQL']['passwd'],
+                                         db=config['MYSQL']['db']
+                                         ) as conn:
                         with conn.cursor() as cur:
                             cur.execute('insert into credit_review values (default, %s, %s, %s, %s, %s, %s)',
                                         (business_data['orderNo'],
@@ -367,8 +372,10 @@ def start_capture(append_date=None):
                                          xs_data['record_path'],
                                          xs_data['startTime'],
                                          '0'))
+                            log.info('插入数据库成功')
                         conn.commit()
             else:
+                log.info("未匹配到业务数据")  # 一般不会执行, 传入值之前已经过滤
                 # 未通过的需要持久化到数据库
                 # cur.execute('insert into credit_review values ')
 
@@ -377,15 +384,23 @@ def start_capture(append_date=None):
             pass
         current_date = time.strftime('%Y-%m-%d', time.localtime())
         # 每天尝试删除超过10天且未通过的信审数据
-        cur.execute(f'delete credit_review where datediff({current_date}, start_time) > 10 ')
-        # 获取已通过列表的历史数据
-        # conn.commit()
-        cur.close()
-        conn.close()
         # TODO 每日删除录音日期超过10天的数据
+        with pymysql.connect(host=config['MYSQL']['host'],
+                             port=config['MYSQL']['port'],
+                             user=config['MYSQL']['user'],
+                             passwd=config['MYSQL']['passwd'],
+                             db=config['MYSQL']['db']
+                             ) as conn:
+            with conn.cursor() as cur:
+                cur.execute('select version()')
+                # cur.execute('delete from credit_review where date(record_time) < date(date_sub(now(),interval 10 day))')
+                log.info('删除过期信审数据成功')
+            conn.commit()
+        # cur.execute(f'delete credit_review where datediff({current_date}, start_time) > 10 ')
+        # 获取已通过列表的历史数据
 
         # log.info(f'将数据推送到抽音框架, 数据列表: 信审-{data_list1}, 客服-{data_list2}, 催收-{data_list3}')
-        data_list1, task_info_count1 = generate_data(data_list1, 'zyhy_xs')
+        data_list1, task_info_count1 = generate_data(data_list_xs, 'zyhy_xs')
         data_list2, task_info_count2 = generate_data(data_list2, 'zyhy_kf')
         data_list3, task_info_count3 = generate_data(data_list3, 'zyhy_cs')
         log.info(f"共获取录音文件 {call_record_count}条, 成功匹配业务数据{task_info_count1 + task_info_count2 + task_info_count3}条")

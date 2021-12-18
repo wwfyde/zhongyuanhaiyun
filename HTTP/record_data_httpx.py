@@ -410,16 +410,19 @@ def start_request_data(date=None):
                         data['record_path'] = local_record_path
                         data['record_uuid'] = uid
                         data['record_dl_flag'] = -1
+                        record_dl_flag = -1
                     else:
 
                         log.info(f'通话流水号: {data["callId"]}, 录音文件下载成功,本地地址: {local_record_path}!')
                         data['record_path'] = local_record_path
                         data['record_uuid'] = uid
                         data['record_dl_flag'] = 1
+                        record_dl_flag = 1
                     break
 
                 else:
                     data['record_dl_flag'] = 0
+                    record_dl_flag = 0
                     # 如果下载失败需要重试
                     i = i + 1
             pass
@@ -465,7 +468,7 @@ def start_request_data(date=None):
                 with conn.cursor() as cur:
                     insert_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
                     cur.execute("insert into records values "
-                                "(default, %d, %d, %s, %s,"
+                                "(default, %s, %s, %s, %s,"
                                 "%s, %s, %s, %s, %s,"
                                 "%s, %s, %s, %s, %s)", (data['record_dl_flag'], business_flag, data['callId'],
                                                         data['startTime'], insert_time, business_type,
@@ -473,6 +476,7 @@ def start_request_data(date=None):
                                                         data['customerPhone'],
                                                         data['agentNickName'], data['startTime'], data['endTime'],
                                                         data['workflow'], data['hanguper']))
+                    log.info("插入数据库成功")
                 conn.commit()
 
             if data['record_dl_flag'] == 1 and business_flag == 1:
@@ -481,7 +485,9 @@ def start_request_data(date=None):
             else:
                 pass
         else:
+
             # TODO 需要添加到额外
+
             log.error("录音文件不存在!")
     log.info(f"昨日录音数据获取成功, 共{len(receive_data)}条, 成功获取录音文件{len(data_list)}条.")
 
