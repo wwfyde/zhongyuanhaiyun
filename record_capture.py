@@ -244,7 +244,7 @@ def generate_data(data_list, data_channel):
                         # 需要重新构造录音列表
                         # 重写 record_list 重新构造录音列表
                         data['reccord_list'] = ','.join(extra_record_list)
-
+                        log.info(f" 订单编号: {data['order_no']}, 存在多条录音, 录音列表: {data['reccord_list']}")
                         # 删除相应不通过数据
                         cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
                                     (data['id_card_no'], data['order_no']))
@@ -357,7 +357,7 @@ def start_capture(append_date=None):
         for xs_data in data_list1:
             if len(xs_data['business_data']) > 0:
                 business_data = xs_data['business_data'][0]
-                if business_data['finalApprovalResult'] == '通过' and business_data['creditReviewResult'] in ('通过',
+                if business_data['finalApprovalResult'] in ('通过', '提首付通过') and business_data['creditReviewResult'] in ('通过',
                                                                                                             '审批中'):
                     data_list_xs.append(xs_data)
                 else:
