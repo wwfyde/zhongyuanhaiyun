@@ -221,40 +221,63 @@ def generate_data(data_list, data_channel):
             data['contact_name'] = business_data['contactName']  # 流入日期
 
             # 设置与任务相关的录音信息列表
-            # TODO 如果是信审数据, 从数据库中查询所有历史录音
-            if data['business_type_desc'] == '信审':
-                with pymysql.connect(host=config['MYSQL']['host'],
-                                     port=config['MYSQL']['port'],
-                                     user=config['MYSQL']['user'],
-                                     passwd=config['MYSQL']['passwd'],
-                                     db=config['MYSQL']['db']) as conn:
-                    with conn.cursor() as cur:
-                        cur.execute('select distinct record_id, record_path, record_time, record_flag '
-                                    'from credit_review '
-                                    'where id_card_no = %s and order_no = %s', (data['id_card_no'], data['order_no']))
-                        record_info_extend, extra_record_list = [], [item["callId"]]
-                        for item2 in cur.fetchall():
-                            record_info_extend.append(dict(record_id=item2[0], record_path=item2[1], record_time=item2[
-                                2], record_flag=item2[3]))
-                            extra_record_list.append(item2[0])
-
-                        data["record_info"] = [record_info]  # 构造录音字段数据
-                        # 将历史录音添加到该任务中
-                        data["record_info"].extend(record_info_extend)
-                        # 需要重新构造录音列表
-                        # 重写 record_list 重新构造录音列表
-                        data['reccord_list'] = ','.join(extra_record_list)
-                        log.info(f" 订单编号: {data['order_no']}, 存在多条录音, 录音列表: {data['reccord_list']}")
-                        # 删除相应不通过数据
-                        cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
-                                    (data['id_card_no'], data['order_no']))
-                    conn.commit()
-            else:
-                data["record_info"] = [record_info]  # 构造录音字段数据
+            data["record_info"] = [record_info]  # 构造录音字段数据
             task_info.append(data)
         else:
             # 该代码默认不会执行
             log.error("未匹配到相关业务接口数据, 将不会推送")
+
+    # 信审类型的task_info 需要重新组装
+    if data_channel == 'zyhy_xs':
+        task_info1, task_info2 = [], []  # 非重复, 已重复数据
+        task_flag_list = []
+        new_task_info = []
+
+        # 将元素去重, 重复的添加到新的列表中
+        for task in task_info:
+            task_flag = (task['order_no'], task['id_card_no'])
+            if task_flag not in task_flag_list:
+                task_flag_list.append(task_flag)
+                task_info1.append(task)
+            else:  # 如果已经存在 则将该录音添加到已有的数据上
+                task_info2.append(task)
+
+        # 将重复的数据添加到同一个任务中
+        for item in task_info1:
+            for item2 in task_info2:
+                if item['order_no'] == item2['order_no'] and item['id_card_no'] == item2['id_card_no']:
+                    item['record_list'] += ',' + item2['record_list']
+                    item['record_info'].append(item2['record_info'][0])
+
+            # 将未通过的数据添加到任务中
+            with pymysql.connect(host=config['MYSQL']['host'],
+                                 port=config['MYSQL']['port'],
+                                 user=config['MYSQL']['user'],
+                                 passwd=config['MYSQL']['passwd'],
+                                 db=config['MYSQL']['db']) as conn:
+                with conn.cursor() as cur:
+                    cur.execute('select distinct record_id, record_path, record_time, record_flag '
+                                'from credit_review '
+                                'where id_card_no = %s and order_no = %s', (item['id_card_no'], item['order_no']))
+                    for item3 in cur.fetchall():
+                        # 将查询到的录音列表数据添加过去
+                        item['record_info'].append(dict(record_id=item3[0], record_path=item3[1], record_time=item3[
+                            2], record_flag=item3[3]))
+                        # 修改录音列表数据 逗号隔开的
+                        item['record_list'] += ',' + item3[0]
+                        log.info("从数据库中取得未通过数据")
+
+                    # 删除相应不通过数据
+                    cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
+                                (item['id_card_no'], item['order_no']))
+                conn.commit()
+            log.info(f" 订单编号: {item['order_no']}, 身份证号: {item['id_card_no']}, 存在多条录音, 录音列表: {item['record_list']}")
+
+            new_task_info.append(item)
+
+        # 将新的数据赋值给task_info
+        task_info = new_task_info
+        pass
 
     log.info(f"已生成 {len(task_info)} 条任务数据")
     # 将task_info数据列表按照 SEND_SIZE 配置项分割成多个部分
@@ -272,12 +295,12 @@ def generate_data(data_list, data_channel):
         "secret": "123456",
         "if_convert": "yes"
     }
-    data_list = []
+    data_list2 = []
     for task_infos in task_info_sep:
         data = data_tmpl.copy()
         data["task_info"] = task_infos
-        data_list.append(data)
-    return data_list, len(task_info)
+        data_list2.append(data)
+    return data_list2, len(task_info)
 
 
 def err_handler(request, exception):
@@ -357,8 +380,9 @@ def start_capture(append_date=None):
         for xs_data in data_list1:
             if len(xs_data['business_data']) > 0:
                 business_data = xs_data['business_data'][0]
-                if business_data['finalApprovalResult'] in ('通过', '提首付通过') and business_data['creditReviewResult'] in ('通过',
-                                                                                                            '审批中'):
+                if business_data['finalApprovalResult'] in ('通过', '提首付通过') and business_data['creditReviewResult'] in (
+                        '通过',
+                        '审批中'):
                     data_list_xs.append(xs_data)
                 else:
                     # 信审未通过, 持久化到数据库中
