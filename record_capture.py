@@ -235,7 +235,7 @@ def generate_data(data_list, data_channel):
 
         # 将元素去重, 重复的添加到新的列表中
         for task in task_info:
-            task_flag = (task['order_no'], task['id_card_no'])
+            task_flag = (task['order_no'], task['customer_phone'])
             if task_flag not in task_flag_list:
                 task_flag_list.append(task_flag)
                 task_info1.append(task)
@@ -245,7 +245,7 @@ def generate_data(data_list, data_channel):
         # 将重复的数据添加到同一个任务中
         for item in task_info1:
             for item2 in task_info2:
-                if item['order_no'] == item2['order_no'] and item['id_card_no'] == item2['id_card_no']:
+                if item['order_no'] == item2['order_no'] and item['customer_phone'] == item2['customer_phone']:
                     item['record_list'] += ',' + item2['record_list']
                     item['record_info'].append(item2['record_info'][0])
 
@@ -258,7 +258,7 @@ def generate_data(data_list, data_channel):
                 with conn.cursor() as cur:
                     cur.execute('select distinct record_id, record_path, record_time, record_flag '
                                 'from credit_review '
-                                'where id_card_no = %s and order_no = %s', (item['id_card_no'], item['order_no']))
+                                'where customer_phone = %s and order_no = %s', (item['customer_phone'], item['order_no']))
                     for item3 in cur.fetchall():
                         # 将查询到的录音列表数据添加过去
                         item['record_info'].append(dict(record_id=item3[0], record_path=item3[1], record_time=item3[
@@ -269,9 +269,9 @@ def generate_data(data_list, data_channel):
 
                     # 删除相应不通过数据
                     cur.execute('delete from credit_review where id_card_no = %s and order_no = %s',
-                                (item['id_card_no'], item['order_no']))
+                                (item['customer_phone'], item['order_no']))
                 conn.commit()
-            log.info(f" 订单编号: {item['order_no']}, 身份证号: {item['id_card_no']}, 存在多条录音, 录音列表: {item['record_list']}")
+            log.info(f" 订单编号: {item['order_no']}, 手机号码: {item['customer_phone']}, 存在多条录音, 录音列表: {item['record_list']}")
 
             new_task_info.append(item)
 
@@ -393,13 +393,17 @@ def start_capture(append_date=None):
                                          db=config['MYSQL']['db']
                                          ) as conn:
                         with conn.cursor() as cur:
-                            cur.execute('insert into credit_review values (default, %s, %s, %s, %s, %s, %s)',
-                                        (business_data['orderNo'],
-                                         business_data['idCardNo'],
-                                         xs_data['callId'],
-                                         xs_data['record_path'],
-                                         xs_data['startTime'],
-                                         '0'))
+                            cur.execute(
+                                """insert into credit_review (id, order_no, id_card_no, record_id, record_path, 
+                                record_time, customer_phone, record_flag ) 
+                                values (default, %s,%s, %s,%s,%s,%s,%s)""",
+                                (business_data['orderNo'],
+                                 business_data['idCardNo'],
+                                 xs_data['callId'],
+                                 xs_data['record_path'],
+                                 xs_data['startTime'],
+                                 business_data['customerPhoneNo'],
+                                 '0'))
                             log.info('插入数据库成功')
                         conn.commit()
             else:
@@ -421,7 +425,7 @@ def start_capture(append_date=None):
                              ) as conn:
             with conn.cursor() as cur:
                 cur.execute('select version()')
-                # cur.execute('delete from credit_review where date(record_time) < date(date_sub(now(),interval 10 day))')
+                cur.execute('delete from credit_review where date(record_time) < date(date_sub(now(),interval 10 day))')
                 log.info('删除过期信审数据成功')
             conn.commit()
         # cur.execute(f'delete credit_review where datediff({current_date}, start_time) > 10 ')

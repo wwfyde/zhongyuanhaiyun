@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS credit_review(
  record_id varchar(100) comment '录音ID',
  record_path varchar(200) comment '录音地址',
  record_time varchar(40) comment '录音时间',
+ customer_phone varchar(40) comment '客户号码',
  record_flag varchar(2) comment '录音标记'
 )
