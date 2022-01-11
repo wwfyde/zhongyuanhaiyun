@@ -120,13 +120,39 @@ TASK_FILED_MAP: {
 }
 
 # 全部大写
-RECORD_FILED: [ 'RECORD_ID','RECORD_PATH','RECORD_TIME','RECORD_FLAG' ]
+RECORD_FILED: [ 'RECORD_ID','RECORD_PATH','RECORD_TIME','RECORD_FLAG',
+                'TOTAL_TIME', 'CALL_NO', 'CALLED_NO', 'HANGUPER',
+                'WORKFLOW', 'CALL_RESULT',  'AGENT_ID', 'AGENT_NAME',
+                'START_TIME', 'END_TIME', 'SUPPLIER_TYPE', 'CALL_STATE',
+                'DEPARTMENT_NAME', 'BUSINESS_TYPE', 'DROP_SIDE', 'RING_TIME', 'CUSTOMER_PHONE', 'RELEVANT_AGENT']
 # 录音维度映射值
 RECORD_FILED_MAP: {
     'RECORD_ID': '电话流水号',
     'RECORD_PATH': 'FilePath',
     'RECORD_TIME': '录音开始时间',
     'RECORD_FLAG': '录音状态标记',
+
+    'TOTAL_TIME': '通话时长',
+    'CALL_NO': '主叫号码',  # 1
+    'CALLED_NO': '被叫号码',
+    'HANGUPER': '挂机方向',  # 1 客户挂机/坐席挂机
+
+    'WORKFLOW': '呼叫类型',  # 1  呼入/呼出
+    'CALL_RESULT': '通话结果',
+    'AGENT_ID': '客服ID',
+    'AGENT_NAME': '客服姓名',# 1
+
+    'START_TIME': '开始时间',  # 1
+    'END_TIME': '结束时间',  # 1
+    'SUPPLIER_TYPE': '供应商类型',
+    'CALL_STATE': '事件状态',
+
+    'DEPARTMENT_NAME': '部门名称', # 1
+    'BUSINESS_TYPE': '业务类型',  # 1
+    'DROP_SIDE': '挂机方向2',
+    'RING_TIME': '来电时间',
+    'CUSTOMER_PHONE': '客户电话',  # 1
+    'RELEVANT_AGENT': '相关客服',
 }
 
 #框架用到的数据库类型:mysql/oracle/mssql

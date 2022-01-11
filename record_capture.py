@@ -147,14 +147,36 @@ def generate_data(data_list, data_channel):
         record_info['record_path'] = item['record_path']  # 本地录音地址
         record_info["record_time"] = item["startTime"]  # 录音开始时间
         record_info["record_flag"] = '0'  # 录音状态标记
+        record_info['called_no'] = item['customerPhone']  # 被叫号码
+        record_info['workflow'] = item['workflow']  # 通话流程 in: 呼入
+        record_info['call_result'] = item['callResult']  # 通话结果
+        record_info['agent_id'] = item['agentId']  # 客服ID
+        record_info['agent_name'] = item['agentNickName']  # 客服名称
+        record_info['relevant_agent'] = item['relevantAgent']  # 相关客服
+        record_info['call_no'] = item['callNo']  # 主叫号码
+        record_info['start_time'] = item['startTime']  # 通话开始时间
+        record_info['end_time'] = item['endTime']  # 通话结束时间
+        record_info['supplier_type'] = item['supplierType']  # 供应商类型
+        record_info['call_state'] = item['callState']  # 事件状态
+        record_info['department_name'] = item['departmentName']  # 坐席所属部门
+        record_info['business_type'] = item['business_type']  # 业务类型
+        record_info['hanguper'] = item['hanguper']  # 主叫方
+
+        # 20211109 新增
+        record_info['total_time'] = item['totalTime']  # 通话时长: 秒
+        record_info['drop_side'] = item['dropSide']  # 挂机方向 为空
+        record_info['ring_time'] = item['agentRingAt']  # 来电时间, 响铃时间
 
         if item['workflow'] == '呼入':
 
             data['customer_phone'] = item['callNo']  # 客户电话
+            record_info['customer_phone'] = item['callNo']  # 客户电话
         elif item['workflow'] == '呼出':
             data['customer_phone'] = item['customerPhone']
+            record_info['customer_phone'] = item['customerPhone']
         else:
             data['customer_phone'] = item['customerPhone']
+            record_info['customer_phone'] = item['customerPhone']
 
         data['called_no'] = item['customerPhone']  # 被叫号码
         data['workflow'] = item['workflow']  # 通话流程 in: 呼入
@@ -425,7 +447,7 @@ def start_capture(append_date=None):
                              ) as conn:
             with conn.cursor() as cur:
                 cur.execute('select version()')
-                cur.execute('delete from credit_review where date(record_time) < date(date_sub(now(),interval 10 day))')
+                cur.execute('delete from credit_review where date(record_time) < date(date_sub(now(),interval 11 day))')
                 log.info('删除过期信审数据成功')
             conn.commit()
         # cur.execute(f'delete credit_review where datediff({current_date}, start_time) > 10 ')
