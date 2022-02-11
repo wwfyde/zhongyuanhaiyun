@@ -239,7 +239,7 @@ def download_record(remote_path: str, local_path: str) -> int:
     :return: 1: 成功, 0, 失败
     """
     try:
-        file = httpx.get(url=remote_path).content
+        file = httpx.get(url=remote_path, verify=False).content
         with open(local_path, 'wb') as f:
             f.write(file)
         status = 1
@@ -356,9 +356,10 @@ def start_request_data(date=None):
         # remote_record_path: str = data['pullRecordUrls']  # 录音下载地址
         # TODO 当录音文件不存在时需要处理
         if data['pullRecordUrls'] and data['callResult'] == 'dealing':
-            remote_record_path: str = data['pullRecordUrls'].replace(
-                'http://minio-7c27d1.camp-uat-upgrade:9000', 'http://10.18.110.120:30200').replace(
-                'http://minio-h0uat.csleasing.com.cn', 'http://10.18.110.120:30200')  # 录音下载地址
+            remote_record_path: str = data['pullRecordUrls']
+            # .replace(
+            #     'http://minio-7c27d1.camp-uat-upgrade:9000', 'http://10.18.110.120:30200').replace(
+            #     'http://minio-h0uat.csleasing.com.cn', 'http://10.18.110.120:30200')  # 录音下载地址
             # 示例 http://minio-7c27d1.camp-uat-upgrade:9000 \
             # /hzero-hzero-public/0/b7b735d91675483a9766c267aa6db191@hollyCrm-1625470045.244822.mp3
 
@@ -428,7 +429,7 @@ def start_request_data(date=None):
             pass
 
             # 查询业务字段
-            if data['customerPhone'] and business_type:
+            if data['customerPhone'] and business_type and data['endTime'] and data['startTime']:
                 # 根据呼叫类型和主被叫号码来判断客户号码
                 if data['workflow'] == 'normal':
                     phone = data['callNo']

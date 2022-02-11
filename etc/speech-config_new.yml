@@ -23,8 +23,8 @@ NMF2G729_BIN: '/usr/local/bin/nmf2G729'
 #TODO  不同渠道采用不同命令 key为渠道名
 # 20211118 单声道改成了双声道 -ac 2
 CMDCOMMANDS: {
-    'zyhy_xs': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '1', '-ab', '128k', 'desWav' ],
-    'zyhy_kf': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '1', '-ab', '128k', 'desWav' ],
+    'zyhy_xs': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '2', '-ab', '128k', 'desWav' ],
+    'zyhy_kf': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '2', '-ab', '128k', 'desWav' ],
     'zyhy_cs': [ 'ffmpeg_path', '-i', 'srcPath', '-ar', '8000', '-ac', '2', '-ab', '128k', 'desWav' ],
 }
 
@@ -51,7 +51,8 @@ TASK_FILED: [ 'TASK_ID','RECORD_LIST','TASK_TIME','TASK_FLAG' , 'CUSTOMER_PHONE'
               'DEALER_NO', 'DEALER_NAME', 'DEALER_ABBR', 'PREQUALIFICATION_LEVEL', 'CREDIT_REVIEW_RESULT',
               'FINAL_APPROVAL_RESULT', 'HANDLE_TIME', 'APPLICATION_STATUS', 'BRAND_TYPE', 'CAR_LEVEL',
               'FINANCE_BALANCE', 'APPLY_TYPE', 'BONDS_NAME', 'COLL_BACK_TYPE', 'CASE_END',
-              'NODE_NAME', 'ID_CARD_NO', 'CASE_DATE', 'CONTACT_NAME', 'CUSTOMER_PROBLEMS'
+              'NODE_NAME', 'ID_CARD_NO', 'CASE_DATE', 'CONTACT_NAME', 'CUSTOMER_PROBLEMS',
+              'SEX'
 
 ]
 
@@ -117,6 +118,8 @@ TASK_FILED_MAP: {
     'CASE_DATE': '流入日期',
     'CONTACT_NAME': '联系名称',
     'CUSTOMER_PROBLEMS': '客户问题',
+
+    'SEX': '性别',
 }
 
 # 全部大写

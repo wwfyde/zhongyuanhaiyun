@@ -241,6 +241,7 @@ def generate_data(data_list, data_channel):
             data['id_card_no'] = business_data['idCardNo']  # 身份证号
             data['case_date'] = business_data['caseDate']  # 流入日期
             data['contact_name'] = business_data['contactName']  # 流入日期
+            data['sex'] = business_data['sex']
 
             # 设置与任务相关的录音信息列表
             data["record_info"] = [record_info]  # 构造录音字段数据
