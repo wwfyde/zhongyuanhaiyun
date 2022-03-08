@@ -22,6 +22,16 @@ scheduler = BlockingScheduler()
 #     # start_request_data()
 #     pass
 
+def clear_data():
+
+    RECORD_STORAGE_DAYS = config["TIMER"]["RECORD_STORAGE_DAYS"]  # 录音存储天数
+    # log.info(f"清理超 {RECORD_STORAGE_DAYS} 天的录音文件...")
+    earliest_day = (datetime.date.today() + datetime.timedelta(days=-RECORD_STORAGE_DAYS)).strftime('%Y-%m-%d')
+    for dir_name in os.listdir(config["PREFIX_PATH"]):
+        if dir_name < earliest_day:
+            # log.info(f"清理录音文件夹：{config['HTTP']['RECORD_PATH']}/{dir_name}")
+            shutil.rmtree(os.path.join(config['PREFIX_PATH'], dir_name))
+
 @scheduler.scheduled_job("cron", second=config["TIMER"]["CAPTURE_SEC"], minute=config["TIMER"]["CAPTURE_MIN"],
                          hour=config["TIMER"]["CAPTURE_HOUR"], misfire_grace_time=30, max_instances=10)
 def record_capture_timer():
@@ -40,16 +50,16 @@ def record_append_timer():
     date = (datetime.date.today() + datetime.timedelta(days=-1)).strftime('%Y-%m-%d')
     append_failed(date)
 
+
 @scheduler.scheduled_job("cron", second=config["TIMER"]["CLEAR_SEC"], minute=config["TIMER"]["CLEAR_MIN"],
                          hour=config["TIMER"]["CLEAR_HOUR"], misfire_grace_time=30, max_instances=10)
 def clear_timer():
     """
     清理原始录音文件定时任务
     """
-    RECORD_STORAGE_DAYS = config["TIMER"]["RECORD_STORAGE_DAYS"]  # 录音存储天数
-    # log.info(f"清理超 {RECORD_STORAGE_DAYS} 天的录音文件...")
-    earliest_day = (datetime.date.today() + datetime.timedelta(days=-RECORD_STORAGE_DAYS)).strftime('%Y-%m-%d')
-    for dir_name in os.listdir(config["HTTP"]["RECORD_PATH"]):
-        if dir_name < earliest_day:
-            # log.info(f"清理录音文件夹：{config['HTTP']['RECORD_PATH']}/{dir_name}")
-            shutil.rmtree(os.path.join(config['HTTP']['RECORD_PATH'], dir_name))
+    clear_data()
+
+
+if __name__ == '__main__':
+    clear_data()
+
