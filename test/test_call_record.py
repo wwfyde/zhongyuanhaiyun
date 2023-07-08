@@ -27,14 +27,14 @@ def request_record_data(start_date: str, end_date: str) -> list:
         receive_data = []  #
         if str(r["status"]) == "200":
             receive_data: list = json.loads(r["payload"])["content"]
-            log.info(f"获取录音记录列表成功, 录音列表: {receive_data}, 共 [{len(receive_data)}]条记录")
+            print(f"获取录音记录列表成功, 录音列表: {receive_data}, 共 [{len(receive_data)}]条记录")
             # for data in receive_data_raw:
             #     item = dict(
             #
             #     )
 
         else:
-            log.error(f"请求录音记录返回了错误的提示信息, 错误码: {r['status']}")
+            print(f"请求录音记录返回了错误的提示信息, 错误码: {r['status']}")
             receive_data = []
 
         # 格式化数据
@@ -77,7 +77,7 @@ def request_record_data(start_date: str, end_date: str) -> list:
         """
         return receive_data
     except Exception as exc:
-        log.error(f"请求第三方接口失败, 请检查接口包含token获取接口是否正常, \n 错误提示: {exc}")
+        print(f"请求第三方接口失败, 请检查接口包含token获取接口是否正常, \n 错误提示: {exc}")
         return []
 
     # app_id = "qualityclient"
@@ -116,7 +116,7 @@ def request_business_data(phone: str = '', start_time: str = '', end_time: str =
     :param agent_name: 坐席姓名
     :return:
     """
-    qc_url = 'http://open-dev.csleasing.com.cn/uop/ecar/v1/voice/queryVoice'
+    qc_url = 'http://open.csleasing.com.cn/uop/ecar/v1/voice/queryVoice'
     try:
         resp = httpx.post(qc_url, json={
             'phoneNo': phone,
@@ -127,6 +127,7 @@ def request_business_data(phone: str = '', start_time: str = '', end_time: str =
         })
 
         result = json.loads(resp.text)
+        print('原始内容', result)
         if result['respCode'] == '0000':
             business_data: list[dict] = result['data']['voiceQualityInspectionList']
             # print(f"获取录音质检业务数据成功, 录音数据: {str(business_data)}")
@@ -146,32 +147,13 @@ if __name__ == '__main__':
     # print(data_list)
     # 查询测试数据
     # 客服
-    business_data1 = request_business_data(phone='18616936217',
-                                           start_time='2021-08-19',
-                                           end_time='2021-08-19',
-                                           business_type='CUSTOMER_SERVICE',
-                                           agent_name='张强19')
-
-    business_data2 = request_business_data(phone='18695451268',
-                                           start_time='2021-09-06',
-                                           end_time='2021-09-06',
+    business_data1 = request_business_data(phone='15038311797',
+                                           start_time='2022-04-13',
+                                           end_time='2022-04-13',
                                            business_type='CREDIT_REVIEW',
-                                           agent_name='李一')
+                                           agent_name='赵亚飞')
 
-    business_data3 = request_business_data(phone='18217296936',
-                                           start_time='2021-04-15',
-                                           end_time='2021-04-15',
-                                           business_type='COLLECTION',
-                                           agent_name='张强')
-    business_data4 = request_business_data(phone='15987454789', business_type='CREDIT_REVIEW')
-    business_data5 = request_business_data(phone='18840820266', business_type='CUSTOMER_SERVICE')
-    business_data6 = request_business_data(phone='17892676755', business_type='COLLECTION')
     print(business_data1)
-    print(business_data2)
-    print(business_data3)
-    print(business_data4)
-    print(business_data5)
-    print(business_data6)
 
 
 
